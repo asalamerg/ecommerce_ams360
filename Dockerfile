@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM dunglas/frankenphp:1.13.4-php8.4.27-trixie AS base
+FROM dunglas/frankenphp:1.13.5-php8.4.27-trixie AS base
 RUN install-php-extensions bcmath exif gd intl opcache pcntl pdo_mysql redis zip
 
 # Wayfinder runs artisan during the Vite build, so this stage needs PHP and Node together.
