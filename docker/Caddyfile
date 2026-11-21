@@ -1,0 +1,65 @@
+{
+	frankenphp
+	admin off
+}
+
+(store) {
+	root * /app/public
+	encode zstd br gzip
+
+	# Uploaded files are data. Nothing under /storage may ever run as code.
+	@uploadedCode path_regexp (?i)^/storage/.*\.(php|phar|phtml|pht)
+	respond @uploadedCode 404
+
+	@dotfiles {
+		path_regexp /\.
+		not path /.well-known/*
+	}
+	respond @dotfiles 404
+
+	@assets path /build/assets/*
+	header @assets Cache-Control "public, max-age=31536000, immutable"
+
+	@uploads {
+		path /storage/*
+		not path /storage/products/* /storage/uploads/*
+	}
+	header @uploads Cache-Control "public, max-age=604800"
+
+	# Uploaded images get a new random name whenever they change, so browsers
+	# and Cloudflare may keep them for a year. Imported catalog files keep
+	# their names and stay at a week.
+	@uploadsRandom path /storage/products/* /storage/uploads/*
+	header @uploadsRandom Cache-Control "public, max-age=31536000, immutable"
+
+	header {
+		X-Content-Type-Options nosniff
+		X-Frame-Options SAMEORIGIN
+		Referrer-Policy strict-origin-when-cross-origin
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		-Server
+		-X-Powered-By
+	}
+
+	php_server {
+		try_files {path} index.php
+	}
+}
+
+{$SERVER_NAME:localhost} {
+	header Strict-Transport-Security "max-age=31536000; includeSubDomains"
+	import store
+}
+
+# One address for search engines: www.example.com sends visitors and links to
+# example.com, keeping the path. Its certificate is issued once the www record
+# points here.
+www.{$SERVER_NAME:localhost} {
+	redir https://{$SERVER_NAME:localhost}{uri} permanent
+}
+
+# Container health check only: never published outside the container.
+http://127.0.0.1:8080 {
+	bind 127.0.0.1
+	import store
+}

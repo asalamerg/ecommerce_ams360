@@ -1,0 +1,239 @@
+name: tests
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+  # Weekly, so advisories published after the last push are still caught.
+  schedule:
+    - cron: '0 6 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_DATABASE: store
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysql -h127.0.0.1 -uroot -e 'select 1' store"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2
+        with:
+          php-version: '8.4'
+          tools: composer:v2
+          coverage: none
+
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+
+      - name: Setup Application
+        run: composer setup
+
+      - name: Run CI Checks
+        run: composer ci:check
+
+      # Fails the build when a PHP or JavaScript dependency has a published
+      # security advisory, so a known hole is never deployed unnoticed.
+      - name: Audit Dependencies
+        run: |
+          composer audit --no-interaction
+          npm audit --audit-level=moderate --omit=dev
+
+      - name: Run Tests on MySQL
+        run: php artisan test
+        env:
+          DB_CONNECTION: mysql
+          DB_DATABASE: store
+
+  # The store driven in a real browser (e2e/): checkout with the test payment
+  # gateway, the brands menu, the admin panel. Catches what the PHP tests cannot.
+  e2e:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2
+        with:
+          php-version: '8.4'
+          extensions: gd, intl, pdo_sqlite
+          tools: composer:v2
+          coverage: none
+
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+
+      - name: Install
+        run: |
+          composer install --no-interaction --prefer-dist
+          cp .env.example .env
+          php artisan key:generate
+          npm ci
+          npm run build
+          npx playwright install --with-deps chromium
+
+      - name: Run browser tests
+        run: npx playwright test
+
+      - name: Keep the failure report
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: playwright-report
+          path: test-results/
+          retention-days: 7
+
+  image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Build Production Image
+        run: docker build --tag store:ci .
+
+  # Every push to main that passes the checks and the browser tests goes live,
+  # through the same deploy/deploy.sh used by hand. deploy.sh builds the image
+  # before it touches the server, so a broken build never reaches it. One deploy
+  # at a time; a newer push waits for the running one instead of cutting it off
+  # mid-migration. Off until the repository variable STORE_URL is set (for
+  # example https://example.com). Secrets: docs/deployment/digitalocean.md.
+  deploy:
+    needs: [ci, e2e]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.STORE_URL != ''
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ vars.STORE_URL }}
+    concurrency:
+      group: production
+      cancel-in-progress: false
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Load the deploy key
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          SSH_PASSPHRASE: ${{ secrets.DEPLOY_SSH_PASSPHRASE }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          for name in DEPLOY_HOST SSH_KEY KNOWN_HOSTS; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Missing secret for ${name}; see docs/deployment/digitalocean.md"
+              exit 1
+            fi
+          done
+
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$KNOWN_HOSTS" | tr -d '\r' | sed 's/^[[:space:]]*//; /^$/d' > ~/.ssh/known_hosts
+
+          eval "$(ssh-agent -s)" > /dev/null
+          echo "SSH_AUTH_SOCK=${SSH_AUTH_SOCK}" >> "$GITHUB_ENV"
+          echo "SSH_AGENT_PID=${SSH_AGENT_PID}" >> "$GITHUB_ENV"
+
+          # The key is only ever held by the agent: the file and the askpass
+          # helper (which hands over the passphrase, if the key has one) are
+          # removed straight after.
+          key="$(mktemp)" && askpass="$(mktemp)" && pub="$(mktemp)"
+          # The key is either the file itself or the file as one line of base64
+          # (base64 -w0 id_ed25519), which survives pasting into the form.
+          if ! printf '%s' "$SSH_KEY" | grep -q -- '-----BEGIN'; then
+            printf '%s' "$SSH_KEY" | tr -d ' \t\r\n' | base64 -d > "$key" 2> /dev/null || true
+          else
+            printf '%s\n' "$SSH_KEY" > "$key"
+          fi
+          # Forgives what pasting into the GitHub form tends to do: Windows line
+          # ends, indented lines, blank lines, or the whole key on one line.
+          tr -d '\r' < "$key" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//; /^$/d' > "$key.clean" && mv "$key.clean" "$key"
+          echo "Key received: $(wc -l < "$key") lines, $(wc -c < "$key") characters."
+          if [ "$(wc -l < "$key")" -eq 1 ] && grep -q -- '-----END' "$key"; then
+            one="$(cat "$key")"
+            begin="${one%%PRIVATE KEY-----*}PRIVATE KEY-----"
+            end="-----END${one##*-----END}"
+            body="${one#"$begin"}" && body="${body%"$end"}"
+            { echo "$begin"; echo $body | tr ' ' '\n'; echo "$end"; } > "$key"
+          fi
+          chmod 600 "$key"
+
+          if ! head -n 1 "$key" | grep -q -- '-----BEGIN .*PRIVATE KEY-----'; then
+            if grep -q '^ssh-' "$key"; then
+              echo "::error::DEPLOY_SSH_KEY holds the public key. Paste the file without .pub (it starts with -----BEGIN OPENSSH PRIVATE KEY-----)."
+            else
+              echo "::error::DEPLOY_SSH_KEY is not a private key. It must start with -----BEGIN OPENSSH PRIVATE KEY-----."
+            fi
+            exit 1
+          fi
+          # An Enter pressed after the passphrase in the form is kept in it.
+          SSH_PASSPHRASE="$(printf '%s' "$SSH_PASSPHRASE" | tr -d '\r\n' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+          export SSH_PASSPHRASE
+          if ! problem="$(ssh-keygen -y -P "$SSH_PASSPHRASE" -f "$key" 2>&1 > "$pub")"; then
+            case "$problem" in
+              *passphrase*) echo "::error::DEPLOY_SSH_PASSPHRASE is wrong for this key." ;;
+              *) echo "::error::DEPLOY_SSH_KEY is cut short or changed: paste the whole file again, from -----BEGIN to -----END." ;;
+            esac
+            exit 1
+          fi
+          echo "Deploy key: $(ssh-keygen -l -f "$pub")"
+          rm -f "$pub"
+          cat > "$askpass" <<'EOF'
+          #!/bin/sh
+          printf '%s\n' "$SSH_PASSPHRASE"
+          EOF
+          chmod 700 "$askpass"
+          SSH_ASKPASS="$askpass" SSH_ASKPASS_REQUIRE=force DISPLAY=:0 ssh-add "$key" < /dev/null
+          rm -f "$key" "$askpass"
+
+      - name: Deploy
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+        run: |
+          DEPLOY_HOST="$(printf '%s' "$DEPLOY_HOST" | tr -d '\r\n ')" bash deploy/deploy.sh
+
+      - name: Check the live store
+        env:
+          STORE_URL: ${{ vars.STORE_URL }}
+        run: |
+          curl --fail --silent --show-error --retry 6 --retry-delay 5 --retry-all-errors \
+            --output /dev/null "${STORE_URL%/}/up"
+          curl --fail --silent --show-error --output /dev/null "${STORE_URL%/}/ar"
+
+      - name: Stop the SSH agent
+        if: always()
+        run: ssh-agent -k > /dev/null 2>&1 || true

@@ -1,0 +1,473 @@
+@import 'tailwindcss';
+
+@import 'tw-animate-css';
+
+@source '../views';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+    --font-sans: 'Cairo', 'Heebo', 'Segoe UI', Tahoma, Arial, sans-serif;
+
+    --radius-lg: var(--radius);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-sm: calc(var(--radius) - 4px);
+
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+
+    --color-destructive: var(--destructive);
+    --color-destructive-foreground: var(--destructive-foreground);
+
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
+
+    --color-sidebar: var(--sidebar);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.145 0 0);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.145 0 0);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.145 0 0);
+    --primary: oklch(0.205 0 0);
+    --primary-foreground: oklch(0.985 0 0);
+    --secondary: oklch(0.97 0 0);
+    --secondary-foreground: oklch(0.205 0 0);
+    --muted: oklch(0.97 0 0);
+    --muted-foreground: oklch(0.556 0 0);
+    --accent: oklch(0.97 0 0);
+    --accent-foreground: oklch(0.205 0 0);
+    --destructive: oklch(0.577 0.245 27.325);
+    --destructive-foreground: oklch(0.577 0.245 27.325);
+    --border: oklch(0.922 0 0);
+    --input: oklch(0.922 0 0);
+    --ring: oklch(0.87 0 0);
+    --chart-1: oklch(0.646 0.222 41.116);
+    --chart-2: oklch(0.6 0.118 184.704);
+    --chart-3: oklch(0.398 0.07 227.392);
+    --chart-4: oklch(0.828 0.189 84.429);
+    --chart-5: oklch(0.769 0.188 70.08);
+    --radius: 0.625rem;
+    --sidebar: oklch(0.985 0 0);
+    --sidebar-foreground: oklch(0.145 0 0);
+    --sidebar-primary: oklch(0.205 0 0);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.97 0 0);
+    --sidebar-accent-foreground: oklch(0.205 0 0);
+    --sidebar-border: oklch(0.922 0 0);
+    --sidebar-ring: oklch(0.87 0 0);
+}
+
+.dark {
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.145 0 0);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: oklch(0.145 0 0);
+    --popover-foreground: oklch(0.985 0 0);
+    --primary: oklch(0.985 0 0);
+    --primary-foreground: oklch(0.205 0 0);
+    --secondary: oklch(0.269 0 0);
+    --secondary-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.269 0 0);
+    --muted-foreground: oklch(0.708 0 0);
+    --accent: oklch(0.269 0 0);
+    --accent-foreground: oklch(0.985 0 0);
+    --destructive: oklch(0.396 0.141 25.723);
+    --destructive-foreground: oklch(0.637 0.237 25.331);
+    --border: oklch(0.269 0 0);
+    --input: oklch(0.269 0 0);
+    --ring: oklch(0.439 0 0);
+    --chart-1: oklch(0.488 0.243 264.376);
+    --chart-2: oklch(0.696 0.17 162.48);
+    --chart-3: oklch(0.769 0.188 70.08);
+    --chart-4: oklch(0.627 0.265 303.9);
+    --chart-5: oklch(0.645 0.246 16.439);
+    --sidebar: oklch(0.205 0 0);
+    --sidebar-foreground: oklch(0.985 0 0);
+    --sidebar-primary: oklch(0.985 0 0);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.269 0 0);
+    --sidebar-accent-foreground: oklch(0.985 0 0);
+    --sidebar-border: oklch(0.269 0 0);
+    --sidebar-ring: oklch(0.439 0 0);
+}
+
+:root {
+    --brand-primary: #f5731c;
+    --brand-primary-hover: #d65f0f;
+    --brand-on-primary: #ffffff;
+    --brand-accent: #bd4d05;
+    --brand-secondary: #1b2a4a;
+    --brand-muted: #6b7280;
+    --brand-topbar: #1b2a4a;
+    --brand-on-topbar: #ffffff;
+    --brand-header: #ffffff;
+    --brand-footer: #1b2a4a;
+    --brand-on-footer: #ffffff;
+    --brand-surface: #f4f5f7;
+    --brand-card: #ffffff;
+    --brand-line: #e6e6e6;
+    --brand-sale: #f5731c;
+    --brand-urgent: #ef4444;
+    --theme-radius-btn: 9999px;
+    --theme-radius-card: 1.25rem;
+    --theme-radius-input: 0.5rem;
+}
+
+@layer components {
+    .scrollbar-none {
+        scrollbar-width: none;
+    }
+
+    .scrollbar-none::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Visible by default, so server-rendered content paints at once. Reveal
+       hides only what starts below the fold, then fades it in when reached. */
+    .reveal {
+        transition:
+            opacity 600ms ease-out,
+            transform 600ms ease-out;
+        transition-delay: var(--reveal-delay, 0ms);
+    }
+
+    .reveal[data-reveal='waiting'] {
+        opacity: 0;
+        transform: translateY(1.25rem);
+        transition: none;
+    }
+
+    .badge-pop {
+        animation: badge-pop 300ms ease-out;
+    }
+
+    @keyframes badge-pop {
+        0% {
+            transform: scale(0.6);
+        }
+        60% {
+            transform: scale(1.2);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    /*
+     * Product cards: a thin border and a soft shadow mixed from the active theme,
+     * so they follow whichever theme the admin picks (and dark mode).
+     */
+    .card-surface {
+        border: 1px solid
+            color-mix(in srgb, var(--brand-line) 88%, var(--brand-primary));
+        background-color: var(--brand-card);
+        box-shadow:
+            0 1px 2px color-mix(in srgb, var(--brand-secondary) 6%, transparent),
+            0 8px 20px -14px
+                color-mix(in srgb, var(--brand-primary) 30%, transparent);
+        transition:
+            transform 300ms ease,
+            box-shadow 300ms ease,
+            border-color 300ms ease;
+    }
+
+    .card-surface:hover {
+        border-color: color-mix(
+            in srgb,
+            var(--brand-primary) 45%,
+            var(--brand-line)
+        );
+        box-shadow:
+            0 2px 4px color-mix(in srgb, var(--brand-secondary) 6%, transparent),
+            0 22px 40px -20px
+                color-mix(in srgb, var(--brand-primary) 45%, transparent);
+    }
+
+    /* A soft moving shine while a product photo loads. */
+    .image-loading {
+        background: linear-gradient(
+                100deg,
+                transparent 30%,
+                color-mix(in srgb, var(--brand-card) 70%, transparent) 50%,
+                transparent 70%
+            )
+            var(--brand-surface);
+        background-size: 200% 100%;
+        animation: image-shine 1.4s linear infinite;
+    }
+
+    @keyframes image-shine {
+        to {
+            background-position: -200% 0;
+        }
+    }
+
+    .heart-pop {
+        animation: heart-pop 450ms cubic-bezier(0.17, 0.89, 0.32, 1.49);
+    }
+
+    @keyframes heart-pop {
+        0% {
+            transform: scale(1);
+        }
+        35% {
+            transform: scale(1.35);
+        }
+        65% {
+            transform: scale(0.9);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .reveal,
+        .reveal[data-reveal='waiting'] {
+            opacity: 1;
+            transform: none;
+            transition: none;
+        }
+
+        .badge-pop,
+        .heart-pop,
+        .image-loading {
+            animation: none;
+        }
+
+        .card-surface {
+            transition: none;
+        }
+    }
+
+    .admin-input {
+        width: 100%;
+        min-height: 2.75rem;
+        border: 1px solid var(--color-line);
+        border-radius: var(--theme-radius-input);
+        background-color: var(--brand-card);
+        color: var(--brand-secondary);
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition:
+            border-color 150ms,
+            box-shadow 150ms;
+    }
+
+    .admin-input:focus {
+        border-color: var(--brand-primary);
+        outline: none;
+        box-shadow: 0 0 0 3px
+            color-mix(in srgb, var(--brand-primary) 20%, transparent);
+    }
+
+    .admin-input:read-only:not(select) {
+        background-color: var(--brand-surface);
+    }
+
+    .admin-checkbox {
+        width: 1.125rem;
+        height: 1.125rem;
+        accent-color: var(--brand-primary);
+    }
+
+    /*
+     * Phones. Safari zooms the whole page into any field whose text is under
+     * 16px, and the admin then has to pinch back out after every tap.
+     */
+    @media (max-width: 39.99rem) {
+        .admin-input {
+            font-size: 1rem;
+        }
+    }
+
+    /*
+     * A list table on a phone becomes one card per row: every column shows as
+     * "label: value", so price, status and the buttons are no longer hidden
+     * behind a sideways scroll nobody notices. Cells say what they are with
+     * data-label (the column title), or data-cell="primary" (the row's title,
+     * full width), "select" (the row checkbox, top corner) and "actions"
+     * (the buttons, a row of large tap targets at the bottom).
+     */
+    @media (max-width: 47.99rem) {
+        /* Relative, so the hidden header below stays inside the table's box. */
+        .admin-table {
+            position: relative;
+            min-width: 0 !important;
+        }
+
+        /* Still read by screen readers. A block, because overflow does not clip
+           a table header group, and its cells would widen the page. */
+        .admin-table thead {
+            display: block;
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip-path: inset(50%);
+            white-space: nowrap;
+        }
+
+        .admin-table,
+        .admin-table tbody,
+        .admin-table tr,
+        .admin-table td {
+            display: block;
+            width: 100%;
+        }
+
+        .admin-table tr {
+            position: relative;
+            padding: 0.875rem 1rem;
+        }
+
+        .admin-table td {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            /* !important: utilities on the cells (truncate, text-end,
+               whitespace-nowrap) sit in a later layer and would win. */
+            max-width: none !important;
+            padding: 0.3rem 0 !important;
+            overflow: visible !important;
+            text-align: end !important;
+            white-space: normal !important;
+            overflow-wrap: anywhere;
+        }
+
+        .admin-table td[data-label]::before {
+            content: attr(data-label);
+            flex-shrink: 0;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--color-ink-soft);
+            text-align: start;
+        }
+
+        .admin-table td[data-cell='primary'] {
+            display: block;
+            padding-bottom: 0.5rem !important;
+            text-align: start !important;
+        }
+
+        .admin-table tr:has(td[data-cell='select']) td[data-cell='primary'] {
+            padding-inline-end: 2.25rem !important;
+        }
+
+        .admin-table td[data-cell='select'] {
+            position: absolute;
+            top: 0.875rem;
+            inset-inline-end: 1rem;
+            width: auto;
+            padding: 0.25rem !important;
+        }
+
+        .admin-table td[data-cell='select'] input {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        .admin-table td[data-cell='actions'] {
+            justify-content: stretch;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            padding-top: 0.75rem !important;
+            border-top: 1px dashed var(--color-line);
+        }
+
+        /* Wrappers step aside so every button is a direct, equal-width item. */
+        .admin-table td[data-cell='actions'] div,
+        .admin-table td[data-cell='actions'] span {
+            display: contents !important;
+        }
+
+        .admin-table td[data-cell='actions'] a,
+        .admin-table td[data-cell='actions'] button {
+            display: inline-flex;
+            flex: 1 1 0;
+            align-items: center;
+            justify-content: center;
+            min-height: 2.75rem;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--color-line);
+            border-radius: var(--theme-radius-btn);
+        }
+    }
+}
+
+/*
+ * Store theme tokens. `inline` keeps each utility pointing at the variable, so the
+ * theme editor can restyle a single preview box. app/Support/Theme/ThemeStylesheet.php
+ * overrides these values for the live theme.
+ */
+@theme inline {
+    --color-brand: var(--brand-primary);
+    --color-brand-hover: var(--brand-primary-hover);
+    --color-on-brand: var(--brand-on-primary);
+    --color-brand-text: var(--brand-accent);
+    --color-ink: var(--brand-secondary);
+    --color-ink-soft: var(--brand-muted);
+    --color-topbar: var(--brand-topbar);
+    --color-on-topbar: var(--brand-on-topbar);
+    --color-header: var(--brand-header);
+    --color-footer: var(--brand-footer);
+    --color-on-footer: var(--brand-on-footer);
+    --color-surface: var(--brand-surface);
+    --color-panel: var(--brand-card);
+    --color-line: var(--brand-line);
+    --color-sale: var(--brand-sale);
+    --color-urgent: var(--brand-urgent);
+
+    --radius-btn: var(--theme-radius-btn);
+    --radius-panel: var(--theme-radius-card);
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+
+    body {
+        @apply bg-background text-foreground;
+    }
+}
