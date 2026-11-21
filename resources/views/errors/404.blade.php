@@ -39,7 +39,8 @@
             'contact' => 'צור קשר',
         ],
     ][$locale];
-    $site = config('app.name');
+    $identity = \App\Support\StoreIdentity::for($locale);
+    $site = $identity['name'];
 @endphp
 <!DOCTYPE html>
 <html lang="{{ $locale }}" dir="{{ $locale === 'en' ? 'ltr' : 'rtl' }}">
@@ -71,7 +72,7 @@
     </style>
 </head>
 <body>
-    <header><a href="/{{ $locale }}">By<span>TechM</span></a></header>
+    <header><a href="/{{ $locale }}">@if ($identity['logo'])<img src="{{ $identity['logo'] }}" alt="{{ $site }}" style="height:32px;width:auto;display:block">@else<span>{{ mb_substr($site, 0, 1) }}</span>{{ mb_substr($site, 1) }}@endif</a></header>
     <main>
         <div class="card">
             <p class="code">404</p>

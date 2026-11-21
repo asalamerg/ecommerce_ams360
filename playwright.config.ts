@@ -27,6 +27,9 @@ const e2eEnv = {
     QUEUE_CONNECTION: 'sync',
     MAIL_MAILER: 'log',
     PAYMENT_GATEWAY: 'fake',
+    // The shop's numbers, which the WhatsApp links need before Settings has its own.
+    STORE_PHONE: '+972 50-000-0000',
+    STORE_WHATSAPP: '+972500000000',
     STORE_REQUIRE_STAFF_2FA: 'false',
     INERTIA_SSR_ENABLED: 'false',
     TURNSTILE_SITE_KEY: '',

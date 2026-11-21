@@ -1,4 +1,4 @@
-import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, router, useForm, usePage } from "@inertiajs/react";
 import {
     CreditCard,
     MessageCircle,
@@ -8,21 +8,22 @@ import {
     Trash2,
     Truck,
     X,
-} from 'lucide-react';
-import type { FormEvent } from 'react';
-import { useState } from 'react';
-import { FieldError } from '@/components/admin/admin-ui';
-import { LineColor } from '@/components/store/color-dots';
-import PointsBox from '@/components/store/points-box';
-import QuantityStepper from '@/components/store/quantity-stepper';
-import Turnstile from '@/components/store/turnstile';
-import { Spinner } from '@/components/ui/spinner';
-import { removeCartLine, updateCartLine } from '@/hooks/use-cart';
-import { useTranslations } from '@/hooks/use-translations';
-import StorefrontLayout from '@/layouts/storefront-layout';
-import type { LoyaltyInfo } from '@/lib/loyalty';
-import { pointsPreview } from '@/lib/loyalty';
-import { formatMoney } from '@/lib/store';
+} from "lucide-react";
+import type { FormEvent } from "react";
+import { useState } from "react";
+import { FieldError } from "@/components/admin/admin-ui";
+import { LineColor } from "@/components/store/color-dots";
+import PointsBox from "@/components/store/points-box";
+import QuantityStepper from "@/components/store/quantity-stepper";
+import Turnstile from "@/components/store/turnstile";
+import { Spinner } from "@/components/ui/spinner";
+import { removeCartLine, updateCartLine } from "@/hooks/use-cart";
+import { useTranslations } from "@/hooks/use-translations";
+import StorefrontLayout from "@/layouts/storefront-layout";
+import type { LoyaltyInfo } from "@/lib/loyalty";
+import { pointsPreview } from "@/lib/loyalty";
+import { formatMoney } from "@/lib/store";
+import FreeDeliveryProgress from "@/components/store/free-delivery-progress";
 
 type Zone = {
     id: number;
@@ -62,42 +63,41 @@ export default function StorefrontCart({
 }: Props) {
     const { cart, errors, locale } = usePage().props as ReturnType<
         typeof usePage
-    >['props'] & { errors: Record<string, string> };
+    >["props"] & { errors: Record<string, string> };
     const t = useTranslations();
-    const [couponCode, setCouponCode] = useState('');
+    const [couponCode, setCouponCode] = useState("");
     const [turnstileKey, setTurnstileKey] = useState(0);
     const items = cart?.items ?? [];
-    const estimate = cart?.has_estimate ? '≈ ' : '';
+    const estimate = cart?.has_estimate ? "≈ " : "";
     const money = (amount: string | number) =>
-        formatMoney(amount, cart?.currency ?? 'ILS', 'en');
+        formatMoney(amount, cart?.currency ?? "ILS", "en");
 
     const form = useForm({
-        customer_name: customer?.name ?? '',
-        phone: customer?.phone ?? '',
-        email: '',
-        address: customer?.address ?? '',
-        notes: '',
-        delivery_method: 'delivery' as 'delivery' | 'pickup',
+        customer_name: customer?.name ?? "",
+        phone: customer?.phone ?? "",
+        email: "",
+        address: customer?.address ?? "",
+        notes: "",
+        delivery_method: "delivery" as "delivery" | "pickup",
         shipping_zone_id: delivery.zones.some(
             (zone) => zone.id === customer?.shipping_zone_id,
         )
             ? String(customer?.shipping_zone_id)
-            : '',
-        branch_id: '',
-        payment_method: (onlinePayment ? 'online' : 'whatsapp') as
-            | 'online'
-            | 'whatsapp',
+            : "",
+        branch_id: "",
+        payment_method: (onlinePayment ? "online" : "whatsapp") as
+            "online" | "whatsapp",
         accept_estimate: false,
-        website: '',
-        turnstile_token: '',
-        use_points: '',
+        website: "",
+        turnstile_token: "",
+        use_points: "",
     });
     const payable = Number(cart?.total ?? 0);
     const points = loyalty
         ? pointsPreview(loyalty, payable, Number(form.data.use_points))
         : null;
     // A preview only: the server works the fee out again from the zone.
-    const pickup = form.data.delivery_method === 'pickup';
+    const pickup = form.data.delivery_method === "pickup";
     const zone = pickup
         ? undefined
         : delivery.zones.find(
@@ -107,28 +107,40 @@ export default function StorefrontCart({
         zone && !(zone.free_over && payable >= Number(zone.free_over))
             ? Number(zone.fee)
             : 0;
-    const online = form.data.payment_method === 'online';
+    const online = form.data.payment_method === "online";
+    // The chosen zone's threshold; before one is chosen, the threshold every
+    // zone shares, if they all have the same one.
+    const sharedFreeOver = [
+        ...new Set(delivery.zones.map((option) => option.free_over)),
+    ];
+    const freeOver = pickup
+        ? null
+        : zone
+          ? zone.free_over
+          : sharedFreeOver.length === 1
+            ? sharedFreeOver[0]
+            : null;
 
     function applyCoupon() {
         if (couponCode.trim()) {
             router.post(
-                '/cart/coupon',
+                "/cart/coupon",
                 { code: couponCode },
                 {
                     preserveScroll: true,
                     preserveState: true,
-                    only: ['cart', 'errors'],
-                    onSuccess: () => setCouponCode(''),
+                    only: ["cart", "errors"],
+                    onSuccess: () => setCouponCode(""),
                 },
             );
         }
     }
 
     function removeCoupon() {
-        router.delete('/cart/coupon', {
+        router.delete("/cart/coupon", {
             preserveScroll: true,
             preserveState: true,
-            only: ['cart', 'errors'],
+            only: ["cart", "errors"],
         });
     }
 
@@ -138,9 +150,9 @@ export default function StorefrontCart({
         // Opened during the click, because browsers block a tab opened after a
         // request. The confirmation page keeps a button in case this one is blocked.
         // An online payment goes to the provider's page instead.
-        const whatsapp = online ? null : window.open('about:blank', '_blank');
+        const whatsapp = online ? null : window.open("about:blank", "_blank");
 
-        form.post('/checkout', {
+        form.post("/checkout", {
             preserveScroll: true,
             onSuccess: (page) => {
                 const { order } = page.props as unknown as {
@@ -159,7 +171,7 @@ export default function StorefrontCart({
 
                 // A Turnstile token is good for one submission only.
                 if (turnstileSiteKey) {
-                    form.setData('turnstile_token', '');
+                    form.setData("turnstile_token", "");
                     setTurnstileKey((key) => key + 1);
                 }
             },
@@ -170,10 +182,10 @@ export default function StorefrontCart({
 
     return (
         <StorefrontLayout>
-            <Head title={t('store.cart')} />
+            <Head title={t("store.cart")} />
             <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
                 <h1 className="mb-6 text-2xl font-black sm:text-3xl">
-                    {t('store.cart')}
+                    {t("store.cart")}
                 </h1>
 
                 {pageError && (
@@ -193,16 +205,16 @@ export default function StorefrontCart({
                             className="mx-auto mb-3 text-ink-soft"
                         />
                         <h2 className="text-lg font-black">
-                            {t('store.cart_empty')}
+                            {t("store.cart_empty")}
                         </h2>
                         <p className="mt-1 text-sm text-ink-soft">
-                            {t('store.cart_empty_hint')}
+                            {t("store.cart_empty_hint")}
                         </p>
                         <Link
                             href={`/${locale}/products`}
                             className="mt-5 inline-block rounded-btn bg-brand px-6 py-3 font-bold text-on-brand transition hover:bg-brand-hover"
                         >
-                            {t('store.shop_now')}
+                            {t("store.shop_now")}
                         </Link>
                     </div>
                 ) : (
@@ -240,7 +252,7 @@ export default function StorefrontCart({
                                             <LineColor color={item.color} />
                                             {item.price_is_estimate && (
                                                 <span className="mt-1 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-bold text-amber-900">
-                                                    {t('store.approximate')}
+                                                    {t("store.approximate")}
                                                 </span>
                                             )}
                                             <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
@@ -259,7 +271,7 @@ export default function StorefrontCart({
                                                 ) : (
                                                     <span className="text-sm font-semibold text-rose-700">
                                                         {t(
-                                                            'store.unavailable_line',
+                                                            "store.unavailable_line",
                                                         )}
                                                     </span>
                                                 )}
@@ -275,7 +287,7 @@ export default function StorefrontCart({
                                                             className="text-xs text-ink-soft"
                                                             dir="ltr"
                                                             aria-label={t(
-                                                                'store.was_price',
+                                                                "store.was_price",
                                                             )}
                                                         >
                                                             {money(
@@ -289,10 +301,10 @@ export default function StorefrontCart({
                                                     <button
                                                         type="button"
                                                         aria-label={t(
-                                                            'store.remove',
+                                                            "store.remove",
                                                         )}
                                                         title={t(
-                                                            'store.remove',
+                                                            "store.remove",
                                                         )}
                                                         onClick={() =>
                                                             removeCartLine(
@@ -316,11 +328,11 @@ export default function StorefrontCart({
 
                             <section className="rounded-panel border border-line bg-panel p-5">
                                 <h2 className="font-black">
-                                    {t('checkout.details')}
+                                    {t("checkout.details")}
                                 </h2>
                                 <div className="mt-4 grid gap-4 sm:grid-cols-2">
                                     <label className="grid content-start gap-1.5 text-sm font-semibold">
-                                        {t('checkout.customer_name')}
+                                        {t("checkout.customer_name")}
                                         <input
                                             required
                                             autoComplete="name"
@@ -328,7 +340,7 @@ export default function StorefrontCart({
                                             value={form.data.customer_name}
                                             onChange={(event) =>
                                                 form.setData(
-                                                    'customer_name',
+                                                    "customer_name",
                                                     event.target.value,
                                                 )
                                             }
@@ -339,7 +351,7 @@ export default function StorefrontCart({
                                         />
                                     </label>
                                     <label className="grid content-start gap-1.5 text-sm font-semibold">
-                                        {t('checkout.customer_phone')}
+                                        {t("checkout.customer_phone")}
                                         <input
                                             required
                                             type="tel"
@@ -349,7 +361,7 @@ export default function StorefrontCart({
                                             value={form.data.phone}
                                             onChange={(event) =>
                                                 form.setData(
-                                                    'phone',
+                                                    "phone",
                                                     event.target.value,
                                                 )
                                             }
@@ -361,7 +373,7 @@ export default function StorefrontCart({
                                     </label>
                                     {!customer && (
                                         <label className="grid content-start gap-1.5 text-sm font-semibold sm:col-span-2">
-                                            {t('order_updates.email_label')}
+                                            {t("order_updates.email_label")}
                                             <input
                                                 type="email"
                                                 dir="ltr"
@@ -370,14 +382,14 @@ export default function StorefrontCart({
                                                 value={form.data.email}
                                                 onChange={(event) =>
                                                     form.setData(
-                                                        'email',
+                                                        "email",
                                                         event.target.value,
                                                     )
                                                 }
                                                 className="admin-input"
                                             />
                                             <span className="text-xs font-normal text-ink-soft">
-                                                {t('order_updates.email_hint')}
+                                                {t("order_updates.email_hint")}
                                             </span>
                                             <FieldError
                                                 message={form.errors.email}
@@ -386,7 +398,7 @@ export default function StorefrontCart({
                                     )}
                                     {!pickup && (
                                         <label className="grid content-start gap-1.5 text-sm font-semibold sm:col-span-2">
-                                            {t('checkout.customer_address')}
+                                            {t("checkout.customer_address")}
                                             <input
                                                 required={
                                                     delivery.zones.length > 0
@@ -396,7 +408,7 @@ export default function StorefrontCart({
                                                 value={form.data.address}
                                                 onChange={(event) =>
                                                     form.setData(
-                                                        'address',
+                                                        "address",
                                                         event.target.value,
                                                     )
                                                 }
@@ -408,14 +420,14 @@ export default function StorefrontCart({
                                         </label>
                                     )}
                                     <label className="grid content-start gap-1.5 text-sm font-semibold sm:col-span-2">
-                                        {t('checkout.customer_notes')}
+                                        {t("checkout.customer_notes")}
                                         <textarea
                                             rows={2}
                                             maxLength={1000}
                                             value={form.data.notes}
                                             onChange={(event) =>
                                                 form.setData(
-                                                    'notes',
+                                                    "notes",
                                                     event.target.value,
                                                 )
                                             }
@@ -432,7 +444,7 @@ export default function StorefrontCart({
                                         value={form.data.website}
                                         onChange={(event) =>
                                             form.setData(
-                                                'website',
+                                                "website",
                                                 event.target.value,
                                             )
                                         }
@@ -443,18 +455,18 @@ export default function StorefrontCart({
 
                             <section className="rounded-panel border border-line bg-panel p-5">
                                 <h2 className="font-black">
-                                    {t('delivery.title')}
+                                    {t("delivery.title")}
                                 </h2>
                                 {delivery.branches.length > 0 && (
                                     <div
                                         role="radiogroup"
                                         className="mt-4 grid gap-2 sm:grid-cols-2"
                                     >
-                                        {(['delivery', 'pickup'] as const).map(
+                                        {(["delivery", "pickup"] as const).map(
                                             (method) => (
                                                 <label
                                                     key={method}
-                                                    className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-sm font-bold transition ${form.data.delivery_method === method ? 'border-brand bg-brand/5' : 'border-line'}`}
+                                                    className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-sm font-bold transition ${form.data.delivery_method === method ? "border-brand bg-brand/5" : "border-line"}`}
                                                 >
                                                     <input
                                                         type="radio"
@@ -466,12 +478,12 @@ export default function StorefrontCart({
                                                         }
                                                         onChange={() =>
                                                             form.setData(
-                                                                'delivery_method',
+                                                                "delivery_method",
                                                                 method,
                                                             )
                                                         }
                                                     />
-                                                    {method === 'delivery' ? (
+                                                    {method === "delivery" ? (
                                                         <Truck
                                                             size={18}
                                                             aria-hidden="true"
@@ -491,20 +503,20 @@ export default function StorefrontCart({
 
                                 {pickup ? (
                                     <label className="mt-4 grid gap-1.5 text-sm font-semibold">
-                                        {t('delivery.branch')}
+                                        {t("delivery.branch")}
                                         <select
                                             required
                                             value={form.data.branch_id}
                                             onChange={(event) =>
                                                 form.setData(
-                                                    'branch_id',
+                                                    "branch_id",
                                                     event.target.value,
                                                 )
                                             }
                                             className="admin-input"
                                         >
                                             <option value="">
-                                                {t('delivery.choose_branch')}
+                                                {t("delivery.choose_branch")}
                                             </option>
                                             {delivery.branches.map((branch) => (
                                                 <option
@@ -514,7 +526,7 @@ export default function StorefrontCart({
                                                     {branch.name}
                                                     {branch.address
                                                         ? ` · ${branch.address}`
-                                                        : ''}
+                                                        : ""}
                                                 </option>
                                             ))}
                                         </select>
@@ -522,13 +534,13 @@ export default function StorefrontCart({
                                             message={form.errors.branch_id}
                                         />
                                         <span className="text-xs font-normal text-ink-soft">
-                                            {t('delivery.pickup_hint')}
+                                            {t("delivery.pickup_hint")}
                                         </span>
                                     </label>
                                 ) : (
                                     delivery.zones.length > 0 && (
                                         <label className="mt-4 grid gap-1.5 text-sm font-semibold">
-                                            {t('delivery.zone')}
+                                            {t("delivery.zone")}
                                             <select
                                                 required
                                                 value={
@@ -536,29 +548,29 @@ export default function StorefrontCart({
                                                 }
                                                 onChange={(event) =>
                                                     form.setData(
-                                                        'shipping_zone_id',
+                                                        "shipping_zone_id",
                                                         event.target.value,
                                                     )
                                                 }
                                                 className="admin-input"
                                             >
                                                 <option value="">
-                                                    {t('delivery.choose_zone')}
+                                                    {t("delivery.choose_zone")}
                                                 </option>
                                                 {delivery.zones.map((zone) => (
                                                     <option
                                                         key={zone.id}
                                                         value={zone.id}
                                                     >
-                                                        {zone.name} ·{' '}
+                                                        {zone.name} ·{" "}
                                                         {Number(zone.fee) > 0
                                                             ? money(zone.fee)
                                                             : t(
-                                                                  'delivery.free',
+                                                                  "delivery.free",
                                                               )}
                                                         {zone.estimate
                                                             ? ` · ${zone.estimate}`
-                                                            : ''}
+                                                            : ""}
                                                     </option>
                                                 ))}
                                             </select>
@@ -567,19 +579,17 @@ export default function StorefrontCart({
                                                     form.errors.shipping_zone_id
                                                 }
                                             />
-                                            {zone?.free_over &&
-                                                shippingFee > 0 && (
-                                                    <span className="text-xs font-normal text-emerald-700">
-                                                        {t(
-                                                            'delivery.free_over',
-                                                            {
-                                                                amount: money(
-                                                                    zone.free_over,
-                                                                ),
-                                                            },
+                                            {freeOver && (
+                                                <div className="mt-1 font-normal">
+                                                    <FreeDeliveryProgress
+                                                        total={payable}
+                                                        threshold={Number(
+                                                            freeOver,
                                                         )}
-                                                    </span>
-                                                )}
+                                                        money={money}
+                                                    />
+                                                </div>
+                                            )}
                                         </label>
                                     )
                                 )}
@@ -588,17 +598,17 @@ export default function StorefrontCart({
                             {onlinePayment && (
                                 <section className="rounded-panel border border-line bg-panel p-5">
                                     <h2 className="font-black">
-                                        {t('payments.title')}
+                                        {t("payments.title")}
                                     </h2>
                                     <div
                                         role="radiogroup"
                                         className="mt-4 grid gap-2 sm:grid-cols-2"
                                     >
-                                        {(['online', 'whatsapp'] as const).map(
+                                        {(["online", "whatsapp"] as const).map(
                                             (method) => (
                                                 <label
                                                     key={method}
-                                                    className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 text-sm transition ${form.data.payment_method === method ? 'border-brand bg-brand/5' : 'border-line'}`}
+                                                    className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 text-sm transition ${form.data.payment_method === method ? "border-brand bg-brand/5" : "border-line"}`}
                                                 >
                                                     <input
                                                         type="radio"
@@ -611,7 +621,7 @@ export default function StorefrontCart({
                                                         }
                                                         onChange={() =>
                                                             form.setData(
-                                                                'payment_method',
+                                                                "payment_method",
                                                                 method,
                                                             )
                                                         }
@@ -641,7 +651,7 @@ export default function StorefrontCart({
 
                         <aside className="rounded-panel border border-line bg-panel p-5 lg:sticky lg:top-24">
                             <h2 className="font-black">
-                                {t('store.order_summary')}
+                                {t("store.order_summary")}
                             </h2>
 
                             {cart?.coupon ? (
@@ -652,7 +662,7 @@ export default function StorefrontCart({
                                     </span>
                                     <button
                                         type="button"
-                                        aria-label={t('store.remove')}
+                                        aria-label={t("store.remove")}
                                         onClick={removeCoupon}
                                     >
                                         <X size={16} aria-hidden="true" />
@@ -670,16 +680,16 @@ export default function StorefrontCart({
                                                 )
                                             }
                                             onKeyDown={(event) => {
-                                                if (event.key === 'Enter') {
+                                                if (event.key === "Enter") {
                                                     event.preventDefault();
                                                     applyCoupon();
                                                 }
                                             }}
                                             placeholder={t(
-                                                'checkout.coupon_placeholder',
+                                                "checkout.coupon_placeholder",
                                             )}
                                             aria-label={t(
-                                                'checkout.coupon_code',
+                                                "checkout.coupon_code",
                                             )}
                                             className="admin-input min-w-0 flex-1"
                                         />
@@ -688,7 +698,7 @@ export default function StorefrontCart({
                                             onClick={applyCoupon}
                                             className="rounded-btn border border-line px-4 text-sm font-bold transition hover:border-brand hover:text-brand-text"
                                         >
-                                            {t('checkout.apply_coupon')}
+                                            {t("checkout.apply_coupon")}
                                         </button>
                                     </div>
                                     <FieldError message={errors.coupon} />
@@ -698,7 +708,7 @@ export default function StorefrontCart({
                             <dl className="mt-4 space-y-2 text-sm">
                                 <div className="flex justify-between">
                                     <dt className="text-ink-soft">
-                                        {t('checkout.subtotal')}
+                                        {t("checkout.subtotal")}
                                     </dt>
                                     <dd dir="ltr">
                                         {estimate}
@@ -707,7 +717,7 @@ export default function StorefrontCart({
                                 </div>
                                 {Number(cart?.discount) > 0 && (
                                     <div className="flex justify-between text-rose-700">
-                                        <dt>{t('checkout.discount')}</dt>
+                                        <dt>{t("checkout.discount")}</dt>
                                         <dd dir="ltr">
                                             -{money(cart?.discount ?? 0)}
                                         </dd>
@@ -716,7 +726,7 @@ export default function StorefrontCart({
                                 {points && points.discount > 0 && (
                                     <div className="flex justify-between text-rose-700">
                                         <dt>
-                                            {t('points.discount', {
+                                            {t("points.discount", {
                                                 points: points.used,
                                             })}
                                         </dt>
@@ -730,19 +740,19 @@ export default function StorefrontCart({
                                         <dt className="text-ink-soft">
                                             {t(
                                                 pickup
-                                                    ? 'delivery.pickup'
-                                                    : 'delivery.fee',
+                                                    ? "delivery.pickup"
+                                                    : "delivery.fee",
                                             )}
                                         </dt>
                                         <dd dir="ltr">
                                             {shippingFee > 0
                                                 ? money(shippingFee)
-                                                : t('delivery.free')}
+                                                : t("delivery.free")}
                                         </dd>
                                     </div>
                                 )}
                                 <div className="flex justify-between border-t border-line pt-2 text-lg font-black">
-                                    <dt>{t('checkout.total')}</dt>
+                                    <dt>{t("checkout.total")}</dt>
                                     <dd dir="ltr">
                                         {estimate}
                                         {money(
@@ -760,7 +770,7 @@ export default function StorefrontCart({
                                     payable={payable}
                                     value={form.data.use_points}
                                     onChange={(value) =>
-                                        form.setData('use_points', value)
+                                        form.setData("use_points", value)
                                     }
                                     error={form.errors.use_points}
                                     money={money}
@@ -770,9 +780,9 @@ export default function StorefrontCart({
                             {cart?.has_estimate && (
                                 <div className="mt-4 rounded-lg bg-amber-50 p-3 text-xs leading-5 text-amber-950">
                                     <p className="font-bold">
-                                        {t('checkout.estimate_title')}
+                                        {t("checkout.estimate_title")}
                                     </p>
-                                    <p>{t('checkout.estimate_may_change')}</p>
+                                    <p>{t("checkout.estimate_may_change")}</p>
                                     <label className="mt-2 flex items-start gap-2 font-semibold">
                                         <input
                                             type="checkbox"
@@ -780,14 +790,14 @@ export default function StorefrontCart({
                                             checked={form.data.accept_estimate}
                                             onChange={(event) =>
                                                 form.setData(
-                                                    'accept_estimate',
+                                                    "accept_estimate",
                                                     event.target.checked,
                                                 )
                                             }
                                             className="admin-checkbox mt-0.5 shrink-0"
                                         />
                                         <span>
-                                            {t('checkout.estimate_consent')}
+                                            {t("checkout.estimate_consent")}
                                         </span>
                                     </label>
                                     <FieldError
@@ -804,7 +814,7 @@ export default function StorefrontCart({
                                         locale={locale}
                                         onToken={(token) =>
                                             form.setData(
-                                                'turnstile_token',
+                                                "turnstile_token",
                                                 token,
                                             )
                                         }
@@ -829,7 +839,7 @@ export default function StorefrontCart({
                                     (!!turnstileSiteKey &&
                                         !form.data.turnstile_token)
                                 }
-                                className={`mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-btn font-bold text-white transition disabled:cursor-not-allowed disabled:opacity-50 ${online ? 'bg-brand text-on-brand hover:bg-brand-hover' : 'bg-emerald-600 hover:bg-emerald-700'}`}
+                                className={`mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-btn font-bold text-white transition disabled:cursor-not-allowed disabled:opacity-50 ${online ? "bg-brand text-on-brand hover:bg-brand-hover" : "bg-emerald-600 hover:bg-emerald-700"}`}
                             >
                                 {form.processing ? (
                                     <Spinner />
@@ -843,15 +853,15 @@ export default function StorefrontCart({
                                 )}
                                 {t(
                                     online
-                                        ? 'payments.pay_now'
-                                        : 'checkout.place_order',
+                                        ? "payments.pay_now"
+                                        : "checkout.place_order",
                                 )}
                             </button>
                             <Link
                                 href={`/${locale}/products`}
                                 className="mt-2 block py-2 text-center text-sm font-bold text-brand-text hover:underline"
                             >
-                                {t('store.keep_shopping')}
+                                {t("store.keep_shopping")}
                             </Link>
                         </aside>
                     </form>

@@ -19,6 +19,9 @@ class ManifestController extends Controller
 {
     public const array ICON_SIZES = [192, 512];
 
+    /** The iPhone home-screen icon and /favicon.ico, which the manifest does not list. */
+    private const array OTHER_SIZES = [180, 48];
+
     public function __invoke(ThemeManager $themes): JsonResponse
     {
         $locale = App::getLocale();
@@ -65,9 +68,27 @@ class ManifestController extends Controller
         return $this->draw($themes, (int) $size, false);
     }
 
+    /**
+     * The iPhone home-screen icon. iOS rounds the corners itself, so the square
+     * is filled like the maskable icon.
+     */
+    public function appleTouchIcon(ThemeManager $themes): Response
+    {
+        return $this->draw($themes, 180, true);
+    }
+
+    /**
+     * /favicon.ico, which search engines and some browsers ask for directly
+     * instead of reading the page's icon link. Every browser accepts a PNG here.
+     */
+    public function favicon(ThemeManager $themes): Response
+    {
+        return $this->draw($themes, 48, false);
+    }
+
     private function draw(ThemeManager $themes, int $size, bool $maskable): Response
     {
-        abort_unless(in_array($size, self::ICON_SIZES, true), 404);
+        abort_unless(in_array($size, [...self::ICON_SIZES, ...self::OTHER_SIZES], true), 404);
 
         $background = $this->color($themes, 'primary', '#F97316');
         $foreground = $this->color($themes, 'onPrimary', '#FFFFFF');

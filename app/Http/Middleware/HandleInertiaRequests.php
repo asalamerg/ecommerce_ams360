@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Services\CartManager;
 use App\Support\AdminNavigation;
 use App\Support\StorefrontFooter;
+use App\Support\StoreIdentity;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Middleware;
@@ -54,6 +55,8 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'name' => config('app.name'),
+            // The shop's name and logo from its settings, for headers and footers.
+            'store' => fn (): array => StoreIdentity::for($locale),
             'auth' => [
                 'user' => $user ? [
                     'id' => $user->id,

@@ -13,6 +13,8 @@ declare module '@inertiajs/core' {
     export interface InertiaConfig {
         sharedPageProps: {
             name: string;
+            /** The shop's name and logo from its settings. */
+            store: { name: string; logo: string | null };
             auth: Auth;
             locale: string;
             direction: 'ltr' | 'rtl';

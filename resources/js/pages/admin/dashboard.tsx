@@ -190,14 +190,14 @@ export default function StoreAdminDashboard({
     lowStock,
     systemWarnings,
 }: Props) {
-    const { auth, locale, name: appName } = usePage().props;
+    const { auth, locale, store } = usePage().props;
     const t = useAdminText();
     const formatDate = useDateFormatter();
 
     return (
         <StoreAdminLayout title={t('Dashboard')}>
             <PageHeader
-                eyebrow={appName}
+                eyebrow={store.name}
                 title={t('Welcome, :name', { name: auth.user?.name ?? '' })}
                 description={t('Store operations at a glance')}
             >

@@ -37,7 +37,8 @@
         @include('partials.seo', ['seo' => $seo])
 
         <x-inertia::head>
-            <title>{{ $seo ? $seo['title'].' - '.config('app.name') : config('app.name') }}</title>
+            @php($storeName = \App\Support\StoreIdentity::for(app()->getLocale())['name'])
+            <title>{{ $seo ? $seo['title'].' - '.$storeName : $storeName }}</title>
         </x-inertia::head>
     </head>
     <body class="font-sans antialiased">

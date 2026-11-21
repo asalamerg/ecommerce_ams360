@@ -43,6 +43,8 @@ Route::get('robots.txt', [SitemapController::class, 'robots'])->name('robots');
 Route::get('manifest.webmanifest', ManifestController::class)->name('manifest');
 Route::get('icons/app-{size}.png', [ManifestController::class, 'icon'])->whereIn('size', ['192', '512'])->name('app-icon');
 Route::get('icons/app-{size}-maskable.png', [ManifestController::class, 'maskableIcon'])->whereIn('size', ['192', '512'])->name('app-icon.maskable');
+Route::get('apple-touch-icon.png', [ManifestController::class, 'appleTouchIcon'])->name('apple-touch-icon');
+Route::get('favicon.ico', [ManifestController::class, 'favicon'])->name('favicon');
 
 Route::get('dashboard', AccountHomeController::class)->middleware('auth')->name('dashboard');
 

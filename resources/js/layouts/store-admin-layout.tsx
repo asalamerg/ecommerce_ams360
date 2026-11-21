@@ -282,7 +282,7 @@ export default function StoreAdminLayout({
     title: string;
 }) {
     const { url, props } = usePage();
-    const { auth, flash, admin, locale, direction, name: appName } = props;
+    const { auth, flash, admin, locale, direction, store } = props;
     const t = useAdminText();
 
     // A toast stays in view wherever the admin lands, unlike a banner at the
@@ -373,10 +373,10 @@ export default function StoreAdminLayout({
                         className="flex items-center gap-3 font-black"
                     >
                         <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand text-lg text-on-brand">
-                            {appName.charAt(0).toUpperCase()}
+                            {store.name.charAt(0).toUpperCase()}
                         </span>
                         <span>
-                            {appName}
+                            {store.name}
                             <span className="block text-xs font-medium text-on-topbar/60">
                                 {t('Store admin')}
                             </span>

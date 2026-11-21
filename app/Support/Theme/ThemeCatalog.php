@@ -44,7 +44,7 @@ class ThemeCatalog
     public static function presets(): array
     {
         return array_map(self::withDerived(...), [
-            'default' => ['primary' => '#F5731C', 'primaryHover' => '#D65F0F', 'secondary' => '#1B2A4A', 'surface' => '#F4F5F7'],
+            'default' => ['primary' => '#F5731C', 'primaryHover' => '#A14A12', 'secondary' => '#1B2A4A', 'surface' => '#F4F5F7'],
             'ocean' => ['primary' => '#0284C7', 'primaryHover' => '#0369A1', 'secondary' => '#0C2D48', 'surface' => '#F0F7FC'],
             'emerald' => ['primary' => '#059669', 'primaryHover' => '#047857', 'secondary' => '#123524', 'surface' => '#F0FAF5'],
             'royal' => ['primary' => '#8B5CF6', 'primaryHover' => '#6D28D9', 'secondary' => '#23124A', 'surface' => '#F5F3FF'],

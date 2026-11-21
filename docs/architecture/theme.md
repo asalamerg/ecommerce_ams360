@@ -10,7 +10,7 @@ The inline `<style>` must stay after `@vite`, otherwise the defaults in `app.css
 
 Components use semantic Tailwind tokens such as `bg-brand`, `text-ink`, `bg-panel` and `border-line`, defined with `@theme inline` in `resources/css/app.css`. Do not add fixed colors such as `bg-orange-500` to the store or admin: they ignore the theme and dark mode. Status colors for success and errors are the exception.
 
-`ThemeStylesheet` is the only place colors are derived. That covers readable text on the top bar and footer, a WCAG AA brand color for text (`--brand-accent`), and the dark palette. The editor's live preview receives its CSS from the server, so it cannot drift from the real result.
+`ThemeStylesheet` is the only place colors are derived. That covers readable text on the top bar and footer, a WCAG AA brand color for text (`--brand-accent`), and the dark palette. Button fills (`--brand-primary` and its hover), the sale badge and muted text are moved toward black or white only as far as WCAG AA (4.5:1) needs, so an owner's color never makes a button unreadable; a color that already passes is kept exactly. The editor's live preview receives its CSS from the server, so it cannot drift from the real result.
 
 ## Data
 
@@ -34,7 +34,7 @@ Dark mode exists only when the live theme enables it. `app.blade.php` sets `data
 
 ## Fonts
 
-Fonts are self-hosted through the `bunny()` entries in `vite.config.ts`, so the store makes no request to a font CDN. Browsers download only the faces a page uses. A new font needs an entry there and in `ThemeCatalog::FONTS`. Arabic fonts have no Hebrew glyphs, so the stack falls back to Heebo.
+Fonts are self-hosted through the `bunny()` entries in `vite.config.ts`, so the store makes no request to a font CDN. Browsers download only the faces a page uses. The plugin writes WOFF and WOFF2 as separate rules and the later one wins, so `woff2Only()` in `vite.config.ts` drops the WOFF rules and browsers fetch the smaller files. A new font needs an entry there and in `ThemeCatalog::FONTS`. Arabic fonts have no Hebrew glyphs, so the stack falls back to Heebo.
 
 ## Adding a preset
 

@@ -130,12 +130,12 @@
 }
 
 :root {
-    --brand-primary: #f5731c;
-    --brand-primary-hover: #d65f0f;
+    --brand-primary: #b85615;
+    --brand-primary-hover: #a14a12;
     --brand-on-primary: #ffffff;
     --brand-accent: #bd4d05;
     --brand-secondary: #1b2a4a;
-    --brand-muted: #6b7280;
+    --brand-muted: #666c7a;
     --brand-topbar: #1b2a4a;
     --brand-on-topbar: #ffffff;
     --brand-header: #ffffff;
@@ -144,7 +144,7 @@
     --brand-surface: #f4f5f7;
     --brand-card: #ffffff;
     --brand-line: #e6e6e6;
-    --brand-sale: #f5731c;
+    --brand-sale: #b85615;
     --brand-urgent: #ef4444;
     --theme-radius-btn: 9999px;
     --theme-radius-card: 1.25rem;
@@ -469,5 +469,27 @@
 
     body {
         @apply bg-background text-foreground;
+    }
+}
+
+/*
+ * Page-to-page cross-fade (see the visit defaults in app.tsx). Short, so a tap
+ * still feels instant; the header keeps its own layer and does not flash.
+ */
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation-duration: 160ms;
+    animation-timing-function: ease-out;
+}
+
+.site-header {
+    view-transition-name: site-header;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+        animation: none !important;
     }
 }

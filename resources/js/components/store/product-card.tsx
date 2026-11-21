@@ -1,14 +1,14 @@
-import { Link, usePage } from '@inertiajs/react';
-import { Check, Palette, ShoppingCart } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
-import { ColorDots } from '@/components/store/color-dots';
-import FavoriteButton from '@/components/store/favorite-button';
-import { Spinner } from '@/components/ui/spinner';
-import { addToCart } from '@/hooks/use-cart';
-import { useTranslations } from '@/hooks/use-translations';
-import { formatMoney } from '@/lib/store';
-import { cn } from '@/lib/utils';
-import type { ProductCard as Product } from '@/types';
+import { Link, usePage } from "@inertiajs/react";
+import { Check, Image as ImageIcon, Palette, ShoppingCart } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ColorDots } from "@/components/store/color-dots";
+import FavoriteButton from "@/components/store/favorite-button";
+import { Spinner } from "@/components/ui/spinner";
+import { addToCart } from "@/hooks/use-cart";
+import { useTranslations } from "@/hooks/use-translations";
+import { formatMoney } from "@/lib/store";
+import { cn } from "@/lib/utils";
+import type { ProductCard as Product } from "@/types";
 
 const LOW_STOCK = 3;
 
@@ -19,7 +19,7 @@ export function AvailabilityNote({ product }: { product: Product }) {
         return (
             <span className="inline-flex items-center gap-1.5 text-xs text-amber-800 dark:text-amber-300">
                 <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" />
-                {t('store.availability_confirm')}
+                {t("store.availability_confirm")}
             </span>
         );
     }
@@ -28,7 +28,7 @@ export function AvailabilityNote({ product }: { product: Product }) {
         return (
             <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-urgent">
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-urgent motion-reduce:animate-none" />
-                {t('store.low_stock', { count: product.stock_quantity })}
+                {t("store.low_stock", { count: product.stock_quantity })}
             </span>
         );
     }
@@ -37,16 +37,16 @@ export function AvailabilityNote({ product }: { product: Product }) {
         <span className="inline-flex items-center gap-1.5 text-xs text-ink-soft">
             <span
                 className={cn(
-                    'h-1.5 w-1.5 rounded-full',
+                    "h-1.5 w-1.5 rounded-full",
                     product.stock_quantity > 0
-                        ? 'bg-emerald-500'
-                        : 'bg-ink-soft',
+                        ? "bg-emerald-500"
+                        : "bg-ink-soft",
                 )}
             />
             {t(
                 product.stock_quantity > 0
-                    ? 'store.in_stock'
-                    : 'store.out_of_stock',
+                    ? "store.in_stock"
+                    : "store.out_of_stock",
             )}
         </span>
     );
@@ -93,7 +93,7 @@ export default function ProductCard({
     return (
         <article
             className={cn(
-                'card-surface group relative flex h-full flex-col overflow-hidden rounded-panel hover:-translate-y-1 motion-reduce:transform-none',
+                "card-surface group relative flex h-full flex-col overflow-hidden rounded-panel hover:-translate-y-1 motion-reduce:transform-none",
                 className,
             )}
         >
@@ -102,8 +102,8 @@ export default function ProductCard({
                 prefetch
                 aria-label={product.name}
                 className={cn(
-                    'relative block aspect-square overflow-hidden bg-surface',
-                    product.image_url && !loaded && 'image-loading',
+                    "relative block aspect-square overflow-hidden bg-surface",
+                    product.image_url && !loaded && "image-loading",
                 )}
             >
                 {product.image_url ? (
@@ -119,9 +119,9 @@ export default function ProductCard({
                             // Never hidden while loading: the picture shows as soon
                             // as it arrives, even before the page's JavaScript runs.
                             className={cn(
-                                'absolute inset-0 h-full w-full object-contain p-4 transition duration-500 group-hover:scale-105 motion-reduce:transform-none',
+                                "absolute inset-0 h-full w-full object-contain p-4 transition duration-500 group-hover:scale-105 motion-reduce:transform-none",
                                 product.second_image_url &&
-                                    'md:group-hover:opacity-0',
+                                    "md:group-hover:opacity-0",
                             )}
                         />
                         {product.second_image_url && (
@@ -136,26 +136,30 @@ export default function ProductCard({
                         )}
                     </>
                 ) : (
-                    <span className="absolute inset-0 grid place-items-center text-4xl font-black text-brand-text">
-                        B
+                    <span className="absolute inset-0 grid place-items-center text-ink-soft/40">
+                        <ImageIcon
+                            size={44}
+                            strokeWidth={1.25}
+                            aria-hidden="true"
+                        />
                     </span>
                 )}
                 <span className="absolute start-2 top-2 flex flex-col items-start gap-1">
                     {product.discount_percent > 0 && (
                         <span className="rounded-full bg-sale px-2 py-0.5 text-xs font-black text-white shadow-sm">
-                            {t('store.sale_badge', {
+                            {t("store.sale_badge", {
                                 percent: product.discount_percent,
                             })}
                         </span>
                     )}
                     {product.is_new && (
                         <span className="rounded-full bg-brand px-2 py-0.5 text-[10px] font-bold text-on-brand shadow-sm">
-                            {t('store.new')}
+                            {t("store.new")}
                         </span>
                     )}
                     {product.price_is_estimate && (
                         <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-900">
-                            {t('store.approximate')}
+                            {t("store.approximate")}
                         </span>
                     )}
                 </span>
@@ -179,23 +183,23 @@ export default function ProductCard({
                     <span
                         dir="ltr"
                         className={cn(
-                            'text-lg font-black',
-                            product.original_price ? 'text-sale' : 'text-ink',
+                            "text-lg font-black",
+                            product.original_price ? "text-sale" : "text-ink",
                         )}
                     >
-                        {product.price_is_estimate && '≈ '}
-                        {formatMoney(product.price, product.currency, 'en')}
+                        {product.price_is_estimate && "≈ "}
+                        {formatMoney(product.price, product.currency, "en")}
                     </span>
                     {product.original_price && (
                         <s
                             dir="ltr"
                             className="text-sm font-semibold text-ink-soft"
-                            aria-label={t('store.was_price')}
+                            aria-label={t("store.was_price")}
                         >
                             {formatMoney(
                                 product.original_price,
                                 product.currency,
-                                'en',
+                                "en",
                             )}
                         </s>
                     )}
@@ -210,7 +214,7 @@ export default function ProductCard({
                         className="mt-3 inline-flex h-10 w-full items-center justify-center gap-2 rounded-btn border border-brand text-sm font-bold text-brand-text transition hover:bg-brand hover:text-on-brand"
                     >
                         <Palette size={16} aria-hidden="true" />
-                        {t('store.choose_color_button')}
+                        {t("store.choose_color_button")}
                     </Link>
                 ) : (
                     <button
@@ -218,10 +222,10 @@ export default function ProductCard({
                         disabled={!product.purchasable || adding}
                         onClick={add}
                         className={cn(
-                            'mt-3 inline-flex h-10 w-full items-center justify-center gap-2 rounded-btn text-sm font-bold transition disabled:cursor-not-allowed',
+                            "mt-3 inline-flex h-10 w-full items-center justify-center gap-2 rounded-btn text-sm font-bold transition disabled:cursor-not-allowed",
                             product.purchasable
-                                ? 'bg-brand text-on-brand hover:bg-brand-hover active:scale-95 motion-reduce:transform-none'
-                                : 'bg-surface text-ink-soft',
+                                ? "bg-brand text-on-brand hover:bg-brand-hover active:scale-95 motion-reduce:transform-none"
+                                : "bg-surface text-ink-soft",
                         )}
                     >
                         {adding ? (
@@ -232,10 +236,10 @@ export default function ProductCard({
                             <ShoppingCart size={16} aria-hidden="true" />
                         )}
                         {!product.purchasable
-                            ? t('store.out_of_stock')
+                            ? t("store.out_of_stock")
                             : added
-                              ? t('store.added')
-                              : t('store.add_to_cart')}
+                              ? t("store.added")
+                              : t("store.add_to_cart")}
                     </button>
                 )}
             </div>

@@ -1,4 +1,4 @@
-import { router, useForm, usePage } from '@inertiajs/react';
+import { router, useForm, usePage } from "@inertiajs/react";
 import {
     AlertTriangle,
     CalendarClock,
@@ -10,19 +10,20 @@ import {
     Save,
     Trash2,
     Upload,
-} from 'lucide-react';
-import type { FormEvent, ReactNode } from 'react';
-import { useEffect, useRef, useState } from 'react';
+} from "lucide-react";
+import type { FormEvent, ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
     FieldError,
     PageHeader,
     panel,
     primaryButton,
     secondaryButton,
-} from '@/components/admin/admin-ui';
-import { useAdminText, useDateFormatter } from '@/hooks/use-admin-text';
-import StoreAdminLayout from '@/layouts/store-admin-layout';
-import { cn } from '@/lib/utils';
+} from "@/components/admin/admin-ui";
+import { useAdminText, useDateFormatter } from "@/hooks/use-admin-text";
+import StoreAdminLayout from "@/layouts/store-admin-layout";
+import { cn } from "@/lib/utils";
+import StoreLogo from "@/components/store/store-logo";
 
 type Colors = Record<string, string>;
 type Theme = {
@@ -64,101 +65,101 @@ type Props = {
 };
 
 const editorProps = [
-    'editor',
-    'saved',
-    'history',
-    'schedules',
-    'flash',
-    'errors',
+    "editor",
+    "saved",
+    "history",
+    "schedules",
+    "flash",
+    "errors",
 ];
 
 const tokenText: Record<string, { name: string; use: string }> = {
     primary: {
-        name: 'Primary color (brand)',
-        use: 'Main buttons, the active menu item, and the input focus border.',
+        name: "Primary color (brand)",
+        use: "Main buttons, the active menu item, and the input focus border.",
     },
     primaryHover: {
-        name: 'Primary hover color',
-        use: 'Shown when hovering main buttons. Best as a slightly darker shade of the primary color.',
+        name: "Primary hover color",
+        use: "Shown when hovering main buttons. Best as a slightly darker shade of the primary color.",
     },
     onPrimary: {
-        name: 'Text on primary color',
-        use: 'Text inside main buttons. Keep white for dark primaries; pick black when the primary is light (e.g. gold or lime).',
+        name: "Text on primary color",
+        use: "Text inside main buttons. Keep white for dark primaries; pick black when the primary is light (e.g. gold or lime).",
     },
     secondary: {
-        name: 'Secondary color (dark)',
-        use: 'Headings and the main text color on every page.',
+        name: "Secondary color (dark)",
+        use: "Headings and the main text color on every page.",
     },
     muted: {
-        name: 'Secondary text color',
-        use: 'Lighter text across the site: descriptions, dates, and form hints.',
+        name: "Secondary text color",
+        use: "Lighter text across the site: descriptions, dates, and form hints.",
     },
     topBar: {
-        name: 'Top bar',
-        use: 'The thin strip at the very top of the store, the home page banner, and the admin side menu. Its text color is picked automatically to stay readable.',
+        name: "Top bar",
+        use: "The thin strip at the very top of the store, the home page banner, and the admin side menu. Its text color is picked automatically to stay readable.",
     },
     headerBg: {
-        name: 'Header background',
-        use: 'Background of the main bar with the logo and menu.',
+        name: "Header background",
+        use: "Background of the main bar with the logo and menu.",
     },
     footer: {
-        name: 'Footer background',
-        use: 'Background of the bottom section of every page. Its text color is picked automatically to stay readable.',
+        name: "Footer background",
+        use: "Background of the bottom section of every page. Its text color is picked automatically to stay readable.",
     },
     background: {
-        name: 'Page background',
-        use: 'Background of form fields. Light borders and dividers are derived from it too.',
+        name: "Page background",
+        use: "Background of form fields. Light borders and dividers are derived from it too.",
     },
     surface: {
-        name: 'Light surface color',
-        use: 'Background of the pages behind cards, and table headers in the admin panel.',
+        name: "Light surface color",
+        use: "Background of the pages behind cards, and table headers in the admin panel.",
     },
     card: {
-        name: 'Card background',
-        use: 'Background of product and category cards, and admin panel cards.',
+        name: "Card background",
+        use: "Background of product and category cards, and admin panel cards.",
     },
     sale: {
-        name: 'Discount badge',
-        use: 'The discount badge on product cards. Its text is white.',
+        name: "Discount badge",
+        use: "The discount badge on product cards. Its text is white.",
     },
     urgent: {
-        name: 'Low stock alert',
-        use: 'The alert shown when a product is running low.',
+        name: "Low stock alert",
+        use: "The alert shown when a product is running low.",
     },
 };
 
 const groupNames: Record<string, string> = {
-    brand: 'Brand & buttons',
-    layout: 'Header, footer & text',
-    surfaces: 'Backgrounds & cards',
-    status: 'Discounts & alerts',
+    brand: "Brand & buttons",
+    layout: "Header, footer & text",
+    surfaces: "Backgrounds & cards",
+    status: "Discounts & alerts",
 };
 
 const presetNames: Record<string, string> = {
-    default: 'Store default',
-    ocean: 'Ocean blue',
-    emerald: 'Emerald green',
-    royal: 'Royal purple',
-    crimson: 'Crimson red',
-    gold: 'Gold & black',
-    midnight: 'Midnight',
-    sunset: 'Sunset',
-    teal: 'Teal',
-    rose: 'Rose',
-    indigo: 'Tech indigo',
-    lime: 'Lime & charcoal',
-    coffee: 'Coffee',
-    mono: 'Black & white',
-    sky: 'Clear sky',
-    plum: 'Plum',
-    forest: 'Forest',
-    graphite: 'Graphite & amber',
+    default: "Store default",
+    ocean: "Ocean blue",
+    emerald: "Emerald green",
+    royal: "Royal purple",
+    crimson: "Crimson red",
+    gold: "Gold & black",
+    midnight: "Midnight",
+    sunset: "Sunset",
+    teal: "Teal",
+    rose: "Rose",
+    indigo: "Tech indigo",
+    lime: "Lime & charcoal",
+    coffee: "Coffee",
+    mono: "Black & white",
+    sky: "Clear sky",
+    plum: "Plum",
+    forest: "Forest",
+    graphite: "Graphite & amber",
 };
 
 const radiusNames: Record<string, string> = {
-    rounded: 'Rounded',
-    medium: 'Medium',
-    sharp: 'Sharp',
+    rounded: "Rounded",
+    medium: "Medium",
+    sharp: "Sharp",
 };
 
 function Swatches({ colors }: { colors: Colors }) {
@@ -167,7 +168,7 @@ function Swatches({ colors }: { colors: Colors }) {
             aria-hidden="true"
             className="flex h-5 overflow-hidden rounded-md"
         >
-            {['primary', 'secondary', 'topBar', 'surface', 'sale'].map(
+            {["primary", "secondary", "topBar", "surface", "sale"].map(
                 (token) => (
                     <span
                         key={token}
@@ -210,7 +211,7 @@ function LivePreview({ css, allowDark }: { css: string; allowDark: boolean }) {
     return (
         <section className={`${panel} p-4`}>
             <div className="mb-3 flex items-center justify-between gap-3">
-                <h2 className="font-extrabold">{t('Live preview')}</h2>
+                <h2 className="font-extrabold">{t("Live preview")}</h2>
                 {allowDark && (
                     <label className="flex items-center gap-2 text-xs font-semibold">
                         <input
@@ -219,7 +220,7 @@ function LivePreview({ css, allowDark }: { css: string; allowDark: boolean }) {
                             onChange={(event) => setDark(event.target.checked)}
                             className="admin-checkbox"
                         />
-                        {t('Preview dark mode')}
+                        {t("Preview dark mode")}
                     </label>
                 )}
             </div>
@@ -227,28 +228,28 @@ function LivePreview({ css, allowDark }: { css: string; allowDark: boolean }) {
             <div
                 data-test="theme-preview"
                 className={cn(
-                    'theme-preview-box overflow-hidden rounded-xl border border-line bg-surface text-ink',
-                    dark && 'preview-dark',
+                    "theme-preview-box overflow-hidden rounded-xl border border-line bg-surface text-ink",
+                    dark && "preview-dark",
                 )}
             >
                 <div className="bg-topbar px-3 py-1.5 text-xs text-on-topbar">
-                    {t('Top bar • Order by phone')}
+                    {t("Top bar • Order by phone")}
                 </div>
                 <div className="flex items-center justify-between bg-header px-3 py-2.5">
                     <span className="font-black text-ink">
-                        By<span className="text-brand-text">TechM</span>
+                        <StoreLogo imageClassName="h-6" />
                     </span>
                     <span className="text-xs text-ink-soft">
-                        {t('Home • Cart')}
+                        {t("Home • Cart")}
                     </span>
                 </div>
                 <div className="p-3">
                     <div className="flex items-center justify-between">
                         <p className="text-sm font-black text-ink">
-                            {t('Section title')}
+                            {t("Section title")}
                         </p>
                         <span className="text-xs font-bold text-brand-text">
-                            {t('View all')}
+                            {t("View all")}
                         </span>
                     </div>
                     <div className="relative mt-2 rounded-panel border border-line bg-panel p-3">
@@ -257,38 +258,38 @@ function LivePreview({ css, allowDark }: { css: string; allowDark: boolean }) {
                         </span>
                         <div className="h-16 rounded-lg bg-surface" />
                         <p className="mt-2 text-sm font-bold text-ink">
-                            {t('Product name')}
+                            {t("Product name")}
                         </p>
                         <p className="text-sm font-black text-brand-text">
                             ₪1,299
                         </p>
                         <p className="text-xs text-ink-soft">
-                            {t('In stock • Delivery in 2 days')}
+                            {t("In stock • Delivery in 2 days")}
                         </p>
                         <p className="text-xs font-bold text-urgent">
-                            {t('Only 3 left!')}
+                            {t("Only 3 left!")}
                         </p>
                         <input
                             readOnly
                             tabIndex={-1}
-                            value={t('Input field')}
+                            value={t("Input field")}
                             className="admin-input mt-2"
                         />
                         <div className="mt-2 flex flex-wrap gap-2">
                             <span className="rounded-btn bg-brand px-3 py-1.5 text-xs font-bold text-on-brand">
-                                {t('Add to cart')}
+                                {t("Add to cart")}
                             </span>
                             <span className="rounded-btn bg-brand-hover px-3 py-1.5 text-xs font-bold text-on-brand">
-                                {t('On hover')}
+                                {t("On hover")}
                             </span>
                             <span className="rounded-btn border border-ink px-3 py-1.5 text-xs font-bold text-ink">
-                                {t('Secondary')}
+                                {t("Secondary")}
                             </span>
                         </div>
                     </div>
                 </div>
                 <div className="bg-footer px-3 py-2 text-xs text-on-footer">
-                    {t('Footer — bottom of page')}
+                    {t("Footer — bottom of page")}
                 </div>
             </div>
         </section>
@@ -333,7 +334,7 @@ export default function ThemeEditor({
         setSaving(true);
 
         router.put(
-            '/admin/theme/draft',
+            "/admin/theme/draft",
             { theme: latest.current.theme, version: latest.current.version },
             {
                 preserveState: true,
@@ -412,23 +413,23 @@ export default function ThemeEditor({
     function setColor(token: string, value: string) {
         update({
             ...theme,
-            preset: 'custom',
+            preset: "custom",
             colors: { ...theme.colors, [token]: value },
         });
     }
 
-    const nameForm = useForm({ name: '' });
+    const nameForm = useForm({ name: "" });
     const scheduleForm = useForm({
-        name: '',
-        source: 'draft',
-        starts_at: '',
-        ends_at: '',
+        name: "",
+        source: "draft",
+        starts_at: "",
+        ends_at: "",
     });
 
     function saveNamed(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
         afterFlush(() =>
-            nameForm.post('/admin/theme/saved', {
+            nameForm.post("/admin/theme/saved", {
                 preserveScroll: true,
                 onSuccess: () => nameForm.reset(),
             }),
@@ -442,11 +443,11 @@ export default function ThemeEditor({
             ...data,
             starts_at: data.starts_at
                 ? new Date(data.starts_at).toISOString()
-                : '',
-            ends_at: data.ends_at ? new Date(data.ends_at).toISOString() : '',
+                : "",
+            ends_at: data.ends_at ? new Date(data.ends_at).toISOString() : "",
         }));
         afterFlush(() =>
-            scheduleForm.post('/admin/theme/schedules', {
+            scheduleForm.post("/admin/theme/schedules", {
                 preserveScroll: true,
                 onSuccess: () => scheduleForm.reset(),
             }),
@@ -454,7 +455,7 @@ export default function ThemeEditor({
     }
 
     function remove(id: number) {
-        if (window.confirm(t('Are you sure you want to delete this?'))) {
+        if (window.confirm(t("Are you sure you want to delete this?"))) {
             router.delete(`/admin/theme/snapshots/${id}`, {
                 preserveScroll: true,
             });
@@ -465,20 +466,20 @@ export default function ThemeEditor({
         const now = Date.now();
 
         if (new Date(schedule.ends_at ?? 0).getTime() <= now) {
-            return 'Ended';
+            return "Ended";
         }
 
         return new Date(schedule.starts_at ?? 0).getTime() <= now
-            ? 'Running now'
-            : 'Upcoming';
+            ? "Running now"
+            : "Upcoming";
     }
 
     const conflict = (errors as Record<string, string>).theme;
 
     return (
-        <StoreAdminLayout title={t('Theme')}>
+        <StoreAdminLayout title={t("Theme")}>
             <PageHeader
-                title={t('Colors & Theme')}
+                title={t("Colors & Theme")}
                 description={t(
                     'Change colors, font and corner style freely: every change is auto-saved as a draft customers don\'t see. Preview it on the site, then press "Publish" to make it live.',
                 )}
@@ -490,15 +491,15 @@ export default function ThemeEditor({
                     className="text-xs font-semibold sm:text-sm"
                 >
                     {saving
-                        ? t('Saving...')
+                        ? t("Saving...")
                         : justSaved
-                          ? `✓ ${t('Draft saved automatically')}`
+                          ? `✓ ${t("Draft saved automatically")}`
                           : editor.hasChanges
                             ? t(
-                                  'You have unpublished changes (draft) — customers still see the previous theme',
+                                  "You have unpublished changes (draft) — customers still see the previous theme",
                               )
                             : t(
-                                  'Everything is published — this is what customers see now',
+                                  "Everything is published — this is what customers see now",
                               )}
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -508,7 +509,7 @@ export default function ThemeEditor({
                         className={`${secondaryButton} xl:hidden`}
                     >
                         <Eye size={16} aria-hidden="true" />
-                        {t('Live preview')}
+                        {t("Live preview")}
                     </a>
                     <a
                         href="/admin/theme/preview"
@@ -517,28 +518,28 @@ export default function ThemeEditor({
                         className={secondaryButton}
                     >
                         <Eye size={16} aria-hidden="true" />
-                        {t('Preview on site')}
+                        {t("Preview on site")}
                     </a>
                     {editor.hasChanges && (
                         <button
                             type="button"
                             className={secondaryButton}
                             onClick={() =>
-                                versioned('/admin/theme/discard', true)
+                                versioned("/admin/theme/discard", true)
                             }
                         >
                             <RotateCcw size={16} aria-hidden="true" />
-                            {t('Discard draft')}
+                            {t("Discard draft")}
                         </button>
                     )}
                     <button
                         type="button"
                         disabled={!editor.hasChanges && !timer.current}
                         className={primaryButton}
-                        onClick={() => versioned('/admin/theme/publish')}
+                        onClick={() => versioned("/admin/theme/publish")}
                     >
                         <Upload size={16} aria-hidden="true" />
-                        {t('Publish')}
+                        {t("Publish")}
                     </button>
                 </div>
             </div>
@@ -568,9 +569,9 @@ export default function ThemeEditor({
                 <div className="min-w-0 space-y-5">
                     <Section
                         icon={<Palette size={18} aria-hidden="true" />}
-                        title={t('Ready-made themes')}
+                        title={t("Ready-made themes")}
                         hint={t(
-                            'Click a theme to apply its colors, then fine-tune any color below.',
+                            "Click a theme to apply its colors, then fine-tune any color below.",
                         )}
                     >
                         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
@@ -589,10 +590,10 @@ export default function ThemeEditor({
                                             })
                                         }
                                         className={cn(
-                                            'rounded-xl border p-2.5 text-start text-sm font-bold transition hover:-translate-y-0.5 hover:shadow-md motion-reduce:transform-none',
+                                            "rounded-xl border p-2.5 text-start text-sm font-bold transition hover:-translate-y-0.5 hover:shadow-md motion-reduce:transform-none",
                                             theme.preset === id
-                                                ? 'border-brand ring-2 ring-brand/30'
-                                                : 'border-line',
+                                                ? "border-brand ring-2 ring-brand/30"
+                                                : "border-line",
                                         )}
                                     >
                                         <Swatches colors={colors} />
@@ -610,19 +611,19 @@ export default function ThemeEditor({
                                 ),
                             )}
                         </div>
-                        {theme.preset === 'custom' && (
+                        {theme.preset === "custom" && (
                             <p className="mt-3 text-sm text-ink-soft">
                                 {t(
-                                    'Custom theme — at least one color differs from the preset.',
+                                    "Custom theme — at least one color differs from the preset.",
                                 )}
                             </p>
                         )}
                     </Section>
 
                     <Section
-                        title={t('Store colors')}
+                        title={t("Store colors")}
                         hint={t(
-                            'Each color shows exactly where it appears on the site.',
+                            "Each color shows exactly where it appears on the site.",
                         )}
                     >
                         <div className="space-y-6">
@@ -711,7 +712,7 @@ export default function ThemeEditor({
                                                                     className="mt-0.5 shrink-0"
                                                                 />
                                                                 {t(
-                                                                    'Warning: text on this color (or this color on its background) will be hard to read. Pick a darker or lighter shade.',
+                                                                    "Warning: text on this color (or this color on its background) will be hard to read. Pick a darker or lighter shade.",
                                                                 )}
                                                             </p>
                                                         )}
@@ -726,9 +727,9 @@ export default function ThemeEditor({
                     </Section>
 
                     <Section
-                        title={t('Font')}
+                        title={t("Font")}
                         hint={t(
-                            'Applies to the whole site. Arabic fonts show Hebrew in the system font; pick Heebo if most of your visitors read Hebrew.',
+                            "Applies to the whole site. Arabic fonts show Hebrew in the system font; pick Heebo if most of your visitors read Hebrew.",
                         )}
                     >
                         <div className="grid gap-2 sm:grid-cols-2">
@@ -749,20 +750,18 @@ export default function ThemeEditor({
                                                 : undefined
                                         }
                                         className={cn(
-                                            'rounded-xl border px-3 py-2.5 text-start transition',
+                                            "rounded-xl border px-3 py-2.5 text-start transition",
                                             theme.font === id
-                                                ? 'border-brand ring-2 ring-brand/30'
-                                                : 'border-line hover:border-brand',
+                                                ? "border-brand ring-2 ring-brand/30"
+                                                : "border-line hover:border-brand",
                                         )}
                                     >
                                         <span className="block text-sm font-bold">
                                             {family ??
-                                                t('System font (default)')}
+                                                t("System font (default)")}
                                         </span>
                                         <span className="block text-sm text-ink-soft">
-                                            {t(
-                                                "My store — today's deals 123",
-                                            )}
+                                            {t("My store — today's deals 123")}
                                         </span>
                                     </button>
                                 ),
@@ -771,9 +770,9 @@ export default function ThemeEditor({
                     </Section>
 
                     <Section
-                        title={t('Corner style')}
+                        title={t("Corner style")}
                         hint={t(
-                            'Controls how rounded buttons, cards and inputs are across the site.',
+                            "Controls how rounded buttons, cards and inputs are across the site.",
                         )}
                     >
                         <div className="grid grid-cols-3 gap-2">
@@ -784,10 +783,10 @@ export default function ThemeEditor({
                                     aria-pressed={theme.radius === radius}
                                     onClick={() => update({ ...theme, radius })}
                                     className={cn(
-                                        'rounded-xl border px-3 py-3 text-sm font-bold transition',
+                                        "rounded-xl border px-3 py-3 text-sm font-bold transition",
                                         theme.radius === radius
-                                            ? 'border-brand ring-2 ring-brand/30'
-                                            : 'border-line hover:border-brand',
+                                            ? "border-brand ring-2 ring-brand/30"
+                                            : "border-line hover:border-brand",
                                     )}
                                 >
                                     {t(radiusNames[radius] ?? radius)}
@@ -796,7 +795,7 @@ export default function ThemeEditor({
                         </div>
                     </Section>
 
-                    <Section title={t('Options')}>
+                    <Section title={t("Options")}>
                         <div className="space-y-4">
                             <label className="flex items-start gap-3">
                                 <input
@@ -812,11 +811,11 @@ export default function ThemeEditor({
                                 />
                                 <span>
                                     <span className="block text-sm font-bold">
-                                        {t('Let visitors use dark mode')}
+                                        {t("Let visitors use dark mode")}
                                     </span>
                                     <span className="block text-xs text-ink-soft">
                                         {t(
-                                            'Shows a moon button in the top bar that switches the visitor to a dark version of this theme; the browser remembers their choice.',
+                                            "Shows a moon button in the top bar that switches the visitor to a dark version of this theme; the browser remembers their choice.",
                                         )}
                                     </span>
                                 </span>
@@ -835,13 +834,13 @@ export default function ThemeEditor({
                                 />
                                 <span>
                                     <span className="block text-sm font-bold">
-                                        {t('Use your logo as the tab icon')}
+                                        {t("Use your logo as the tab icon")}
                                     </span>
                                     <span className="block text-xs text-ink-soft">
                                         {t(
                                             hasLogo
-                                                ? 'The logo uploaded in Settings appears next to the site name in the browser tab instead of the bolt icon.'
-                                                : 'No logo uploaded yet (in Settings), so the bolt icon in theme colors stays until you upload one.',
+                                                ? "The logo uploaded in Settings appears next to the site name in the browser tab instead of the bolt icon."
+                                                : "No logo uploaded yet (in Settings), so the bolt icon in theme colors stays until you upload one.",
                                         )}
                                     </span>
                                 </span>
@@ -851,24 +850,24 @@ export default function ThemeEditor({
                                 className={secondaryButton}
                                 onClick={() =>
                                     update({
-                                        preset: 'default',
+                                        preset: "default",
                                         colors: catalog.presets.default,
-                                        font: 'cairo',
-                                        radius: 'rounded',
+                                        font: "cairo",
+                                        radius: "rounded",
                                         darkMode: false,
                                         logoFavicon: false,
                                     })
                                 }
                             >
                                 <RotateCcw size={16} aria-hidden="true" />
-                                {t('Reset draft to default settings')}
+                                {t("Reset draft to default settings")}
                             </button>
                         </div>
                     </Section>
 
                     <Section
                         icon={<Save size={18} aria-hidden="true" />}
-                        title={t('My saved themes')}
+                        title={t("My saved themes")}
                         hint={t(
                             'Save the current draft under a name (e.g. "Ramadan theme") to come back to it or schedule it later.',
                         )}
@@ -880,14 +879,14 @@ export default function ThemeEditor({
                             <input
                                 value={nameForm.data.name}
                                 onChange={(event) =>
-                                    nameForm.setData('name', event.target.value)
+                                    nameForm.setData("name", event.target.value)
                                 }
                                 maxLength={60}
                                 required
                                 placeholder={t(
-                                    'Theme name, e.g. Ramadan theme',
+                                    "Theme name, e.g. Ramadan theme",
                                 )}
-                                aria-label={t('Theme name, e.g. Ramadan theme')}
+                                aria-label={t("Theme name, e.g. Ramadan theme")}
                                 className="admin-input min-w-48 flex-1"
                             />
                             <button
@@ -895,7 +894,7 @@ export default function ThemeEditor({
                                 disabled={nameForm.processing}
                                 className={secondaryButton}
                             >
-                                {t('Save current theme')}
+                                {t("Save current theme")}
                             </button>
                             <span className="w-full">
                                 <FieldError message={nameForm.errors.name} />
@@ -924,11 +923,11 @@ export default function ThemeEditor({
                                                 )
                                             }
                                         >
-                                            {t('Apply to draft')}
+                                            {t("Apply to draft")}
                                         </button>
                                         <button
                                             type="button"
-                                            aria-label={t('Delete')}
+                                            aria-label={t("Delete")}
                                             className="text-rose-700"
                                             onClick={() => remove(item.id)}
                                         >
@@ -942,16 +941,16 @@ export default function ThemeEditor({
                             </ul>
                         ) : (
                             <p className="mt-4 text-sm text-ink-soft">
-                                {t('No saved themes yet.')}
+                                {t("No saved themes yet.")}
                             </p>
                         )}
                     </Section>
 
                     <Section
                         icon={<CalendarClock size={18} aria-hidden="true" />}
-                        title={t('Scheduled seasonal themes')}
+                        title={t("Scheduled seasonal themes")}
                         hint={t(
-                            'Pick a theme and a time window (e.g. Black Friday or Ramadan): it switches on automatically at the start and the published theme returns automatically at the end.',
+                            "Pick a theme and a time window (e.g. Black Friday or Ramadan): it switches on automatically at the start and the published theme returns automatically at the end.",
                         )}
                     >
                         <form
@@ -959,18 +958,18 @@ export default function ThemeEditor({
                             className="grid gap-3 sm:grid-cols-2"
                         >
                             <label className="grid gap-1.5 text-sm font-semibold">
-                                {t('Occasion name')}
+                                {t("Occasion name")}
                                 <input
                                     value={scheduleForm.data.name}
                                     onChange={(event) =>
                                         scheduleForm.setData(
-                                            'name',
+                                            "name",
                                             event.target.value,
                                         )
                                     }
                                     maxLength={60}
                                     required
-                                    placeholder={t('e.g. Black Friday')}
+                                    placeholder={t("e.g. Black Friday")}
                                     className="admin-input"
                                 />
                                 <FieldError
@@ -978,19 +977,19 @@ export default function ThemeEditor({
                                 />
                             </label>
                             <label className="grid gap-1.5 text-sm font-semibold">
-                                {t('Theme')}
+                                {t("Theme")}
                                 <select
                                     value={scheduleForm.data.source}
                                     onChange={(event) =>
                                         scheduleForm.setData(
-                                            'source',
+                                            "source",
                                             event.target.value,
                                         )
                                     }
                                     className="admin-input"
                                 >
                                     <option value="draft">
-                                        {t('Current draft')}
+                                        {t("Current draft")}
                                     </option>
                                     {saved.map((item) => (
                                         <option key={item.id} value={item.id}>
@@ -1000,14 +999,14 @@ export default function ThemeEditor({
                                 </select>
                             </label>
                             <label className="grid gap-1.5 text-sm font-semibold">
-                                {t('Starts at')}
+                                {t("Starts at")}
                                 <input
                                     type="datetime-local"
                                     required
                                     value={scheduleForm.data.starts_at}
                                     onChange={(event) =>
                                         scheduleForm.setData(
-                                            'starts_at',
+                                            "starts_at",
                                             event.target.value,
                                         )
                                     }
@@ -1018,14 +1017,14 @@ export default function ThemeEditor({
                                 />
                             </label>
                             <label className="grid gap-1.5 text-sm font-semibold">
-                                {t('Ends at')}
+                                {t("Ends at")}
                                 <input
                                     type="datetime-local"
                                     required
                                     value={scheduleForm.data.ends_at}
                                     onChange={(event) =>
                                         scheduleForm.setData(
-                                            'ends_at',
+                                            "ends_at",
                                             event.target.value,
                                         )
                                     }
@@ -1041,7 +1040,7 @@ export default function ThemeEditor({
                                     disabled={scheduleForm.processing}
                                     className={secondaryButton}
                                 >
-                                    {t('Add schedule')}
+                                    {t("Add schedule")}
                                 </button>
                             </div>
                         </form>
@@ -1062,7 +1061,7 @@ export default function ThemeEditor({
                                             <span className="block text-xs text-ink-soft">
                                                 {item.starts_at &&
                                                     formatDate(item.starts_at)}
-                                                {' — '}
+                                                {" — "}
                                                 {item.ends_at &&
                                                     formatDate(item.ends_at)}
                                             </span>
@@ -1072,7 +1071,7 @@ export default function ThemeEditor({
                                         </span>
                                         <button
                                             type="button"
-                                            aria-label={t('Delete')}
+                                            aria-label={t("Delete")}
                                             className="text-rose-700"
                                             onClick={() => remove(item.id)}
                                         >
@@ -1086,14 +1085,14 @@ export default function ThemeEditor({
                             </ul>
                         ) : (
                             <p className="mt-4 text-sm text-ink-soft">
-                                {t('No scheduled themes.')}
+                                {t("No scheduled themes.")}
                             </p>
                         )}
                     </Section>
 
                     <Section
                         icon={<History size={18} aria-hidden="true" />}
-                        title={t('Publish history (undo)')}
+                        title={t("Publish history (undo)")}
                         hint={t(
                             'The last 10 themes that were live before each publish. Press "Restore" to load one into the draft, then publish it.',
                         )}
@@ -1123,14 +1122,14 @@ export default function ThemeEditor({
                                                 )
                                             }
                                         >
-                                            {t('Restore')}
+                                            {t("Restore")}
                                         </button>
                                     </li>
                                 ))}
                             </ul>
                         ) : (
                             <p className="text-sm text-ink-soft">
-                                {t('Nothing published yet, history is empty.')}
+                                {t("Nothing published yet, history is empty.")}
                             </p>
                         )}
                     </Section>

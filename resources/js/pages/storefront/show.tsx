@@ -1,31 +1,38 @@
-import { Link, usePage } from '@inertiajs/react';
-import { ShoppingCart, Truck, Undo2, Zap } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
-import { ColorPicker } from '@/components/store/color-dots';
-import Countdown from '@/components/store/countdown';
-import FavoriteButton from '@/components/store/favorite-button';
-import { CompareButton } from '@/components/store/compare';
-import { ProductWhatsAppLink } from '@/components/store/whatsapp-button';
-import ProductCard, { AvailabilityNote } from '@/components/store/product-card';
+import { Link, usePage } from "@inertiajs/react";
+import {
+    Image as ImageIcon,
+    ShoppingCart,
+    Truck,
+    Undo2,
+    Zap,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ColorPicker } from "@/components/store/color-dots";
+import Countdown from "@/components/store/countdown";
+import FavoriteButton from "@/components/store/favorite-button";
+import { CompareButton } from "@/components/store/compare";
+import ShareButton from "@/components/store/share-button";
+import { ProductWhatsAppLink } from "@/components/store/whatsapp-button";
+import ProductCard, { AvailabilityNote } from "@/components/store/product-card";
 import {
     NotifyWhenAvailable,
     ProductReviews,
     Stars,
-} from '@/components/store/product-reviews';
-import type { ReviewsData } from '@/components/store/product-reviews';
-import QuantityStepper from '@/components/store/quantity-stepper';
-import Rail from '@/components/store/rail';
+} from "@/components/store/product-reviews";
+import type { ReviewsData } from "@/components/store/product-reviews";
+import QuantityStepper from "@/components/store/quantity-stepper";
+import Rail from "@/components/store/rail";
 import RecentlyViewed, {
     rememberViewed,
-} from '@/components/store/recently-viewed';
-import SeoTitle from '@/components/store/seo-title';
-import { Spinner } from '@/components/ui/spinner';
-import { addToCart } from '@/hooks/use-cart';
-import { useTranslations } from '@/hooks/use-translations';
-import StorefrontLayout from '@/layouts/storefront-layout';
-import { formatMoney } from '@/lib/store';
-import { cn } from '@/lib/utils';
-import type { ProductCard as Card, OfferCard } from '@/types';
+} from "@/components/store/recently-viewed";
+import SeoTitle from "@/components/store/seo-title";
+import { Spinner } from "@/components/ui/spinner";
+import { addToCart } from "@/hooks/use-cart";
+import { useTranslations } from "@/hooks/use-translations";
+import StorefrontLayout from "@/layouts/storefront-layout";
+import { formatMoney } from "@/lib/store";
+import { cn } from "@/lib/utils";
+import type { ProductCard as Card, OfferCard } from "@/types";
 
 type Product = Card & {
     sku: string | null;
@@ -60,20 +67,20 @@ export default function StorefrontProduct({
     const mainImage = useRef<HTMLImageElement>(null);
     const [active, setActive] = useState(0);
     const [quantity, setQuantity] = useState(1);
-    const [busy, setBusy] = useState<'add' | 'buy' | null>(null);
+    const [busy, setBusy] = useState<"add" | "buy" | null>(null);
     // One color is picked for the customer when there is only one.
     const [colorId, setColorId] = useState<number | null>(
         product.colors.length === 1 ? product.colors[0].id : null,
     );
     const [colorMissing, setColorMissing] = useState(false);
-    const price = formatMoney(product.price, product.currency, 'en');
+    const price = formatMoney(product.price, product.currency, "en");
 
-    function add(mode: 'add' | 'buy') {
+    function add(mode: "add" | "buy") {
         if (product.colors.length > 0 && colorId === null) {
             setColorMissing(true);
             document
-                .getElementById('product-colors')
-                ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                .getElementById("product-colors")
+                ?.scrollIntoView({ behavior: "smooth", block: "center" });
 
             return;
         }
@@ -82,7 +89,7 @@ export default function StorefrontProduct({
         addToCart(product.id, quantity, {
             image: mainImage.current,
             colorId,
-            goToCart: mode === 'buy' ? `/${locale}/cart` : undefined,
+            goToCart: mode === "buy" ? `/${locale}/cart` : undefined,
             onFinish: () => setBusy(null),
         });
     }
@@ -94,9 +101,9 @@ export default function StorefrontProduct({
 
         setActive(index);
         slide?.scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest',
-            inline: 'center',
+            behavior: "smooth",
+            block: "nearest",
+            inline: "center",
         });
     }
 
@@ -115,14 +122,14 @@ export default function StorefrontProduct({
             <SeoTitle />
             <main className="mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-8 lg:px-8">
                 <nav
-                    aria-label={t('store.home')}
+                    aria-label={t("store.home")}
                     className="mb-4 flex flex-wrap items-center gap-x-2 text-sm"
                 >
                     <Link
                         href={`/${locale}`}
                         className="text-ink-soft hover:text-brand-text"
                     >
-                        {t('store.home')}
+                        {t("store.home")}
                     </Link>
                     {product.category && product.category_slug && (
                         <>
@@ -149,7 +156,7 @@ export default function StorefrontProduct({
                                 : [null]
                             ).map((image, index) => (
                                 <div
-                                    key={image ?? 'empty'}
+                                    key={image ?? "empty"}
                                     className="aspect-square w-full shrink-0 snap-center"
                                 >
                                     {image ? (
@@ -162,16 +169,20 @@ export default function StorefrontProduct({
                                             src={image}
                                             alt={product.name}
                                             fetchPriority={
-                                                index === 0 ? 'high' : undefined
+                                                index === 0 ? "high" : undefined
                                             }
                                             loading={
-                                                index === 0 ? undefined : 'lazy'
+                                                index === 0 ? undefined : "lazy"
                                             }
                                             className="h-full w-full object-contain p-6 sm:p-10"
                                         />
                                     ) : (
-                                        <span className="grid h-full place-items-center text-7xl font-black text-brand-text">
-                                            B
+                                        <span className="grid h-full place-items-center text-ink-soft/40">
+                                            <ImageIcon
+                                                size={72}
+                                                strokeWidth={1}
+                                                aria-hidden="true"
+                                            />
                                         </span>
                                     )}
                                 </div>
@@ -187,10 +198,10 @@ export default function StorefrontProduct({
                                         aria-label={`${product.name} ${index + 1}`}
                                         aria-pressed={active === index}
                                         className={cn(
-                                            'h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 bg-surface transition hover:border-brand',
+                                            "h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 bg-surface transition hover:border-brand",
                                             active === index
-                                                ? 'border-brand'
-                                                : 'border-transparent',
+                                                ? "border-brand"
+                                                : "border-transparent",
                                         )}
                                     >
                                         <img
@@ -234,25 +245,25 @@ export default function StorefrontProduct({
                             <span
                                 dir="ltr"
                                 className={cn(
-                                    'text-3xl font-black',
+                                    "text-3xl font-black",
                                     product.original_price
-                                        ? 'text-sale'
-                                        : 'text-ink',
+                                        ? "text-sale"
+                                        : "text-ink",
                                 )}
                             >
-                                {product.price_is_estimate && '≈ '}
+                                {product.price_is_estimate && "≈ "}
                                 {price}
                             </span>
                             {product.original_price && (
                                 <s
                                     dir="ltr"
                                     className="text-lg font-bold text-ink-soft"
-                                    aria-label={t('store.was_price')}
+                                    aria-label={t("store.was_price")}
                                 >
                                     {formatMoney(
                                         product.original_price,
                                         product.currency,
-                                        'en',
+                                        "en",
                                     )}
                                 </s>
                             )}
@@ -260,17 +271,17 @@ export default function StorefrontProduct({
                         {product.original_price && (
                             <div className="mt-2 flex flex-wrap items-center gap-2 text-sm font-bold">
                                 <span className="rounded-full bg-sale px-3 py-1 text-white">
-                                    {t('store.sale_badge', {
+                                    {t("store.sale_badge", {
                                         percent: product.discount_percent,
                                     })}
                                 </span>
                                 <span className="text-sale">
-                                    {t('store.you_save', {
+                                    {t("store.you_save", {
                                         amount: formatMoney(
                                             Number(product.original_price) -
                                                 Number(product.price),
                                             product.currency,
-                                            'en',
+                                            "en",
                                         ),
                                     })}
                                 </span>
@@ -292,7 +303,7 @@ export default function StorefrontProduct({
                         )}
                         {product.price_is_estimate && (
                             <span className="mt-2 w-fit rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-900">
-                                {t('store.approximate')}
+                                {t("store.approximate")}
                             </span>
                         )}
                         <div className="mt-3">
@@ -300,7 +311,7 @@ export default function StorefrontProduct({
                         </div>
                         {product.sku && (
                             <p className="mt-2 text-sm text-ink-soft">
-                                {t('store.sku')}: {product.sku}
+                                {t("store.sku")}: {product.sku}
                             </p>
                         )}
 
@@ -321,7 +332,7 @@ export default function StorefrontProduct({
                         {product.purchasable && (
                             <div className="mt-5">
                                 <span className="mb-1.5 block text-sm font-semibold">
-                                    {t('store.quantity')}
+                                    {t("store.quantity")}
                                 </span>
                                 <QuantityStepper
                                     value={quantity}
@@ -336,10 +347,10 @@ export default function StorefrontProduct({
                                 <button
                                     type="button"
                                     disabled={!product.purchasable || !!busy}
-                                    onClick={() => add('add')}
+                                    onClick={() => add("add")}
                                     className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-btn bg-brand font-bold text-on-brand transition hover:bg-brand-hover active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 motion-reduce:transform-none"
                                 >
-                                    {busy === 'add' ? (
+                                    {busy === "add" ? (
                                         <Spinner />
                                     ) : (
                                         <ShoppingCart
@@ -348,22 +359,22 @@ export default function StorefrontProduct({
                                         />
                                     )}
                                     {product.purchasable
-                                        ? t('store.add_to_cart')
-                                        : t('store.out_of_stock')}
+                                        ? t("store.add_to_cart")
+                                        : t("store.out_of_stock")}
                                 </button>
                                 {product.purchasable && (
                                     <button
                                         type="button"
                                         disabled={!!busy}
-                                        onClick={() => add('buy')}
+                                        onClick={() => add("buy")}
                                         className="inline-flex h-12 items-center justify-center gap-2 rounded-btn border border-ink px-4 font-bold text-ink transition hover:bg-ink hover:text-panel disabled:opacity-50 sm:px-6"
                                     >
-                                        {busy === 'buy' ? (
+                                        {busy === "buy" ? (
                                             <Spinner />
                                         ) : (
                                             <Zap size={17} aria-hidden="true" />
                                         )}
-                                        {t('store.buy_now')}
+                                        {t("store.buy_now")}
                                     </button>
                                 )}
                             </div>
@@ -371,6 +382,7 @@ export default function StorefrontProduct({
 
                         <div className="mt-4 flex flex-wrap items-center gap-2">
                             <CompareButton productId={product.id} />
+                            <ShareButton title={product.name} />
                             <ProductWhatsAppLink />
                         </div>
                         {notifyWhenAvailable && (
@@ -385,7 +397,7 @@ export default function StorefrontProduct({
                                 className="mt-4 inline-flex items-center gap-2 text-sm text-ink-soft hover:text-brand-text"
                             >
                                 <Stars value={reviews.average} size={15} />
-                                {t('reviews.summary', {
+                                {t("reviews.summary", {
                                     average: reviews.average,
                                     count: reviews.count,
                                 })}
@@ -395,7 +407,7 @@ export default function StorefrontProduct({
                         {product.description && (
                             <section className="mt-6 border-t border-line pt-5">
                                 <h2 className="font-bold">
-                                    {t('store.description')}
+                                    {t("store.description")}
                                 </h2>
                                 <p className="mt-2 leading-7 whitespace-pre-line text-ink-soft">
                                     {product.description}
@@ -407,15 +419,15 @@ export default function StorefrontProduct({
                             <div className="mt-6 grid gap-2 border-t border-line pt-5">
                                 {[
                                     {
-                                        key: 'delivery',
+                                        key: "delivery",
                                         icon: Truck,
-                                        title: t('service.delivery_policy'),
+                                        title: t("service.delivery_policy"),
                                         text: policies.delivery,
                                     },
                                     {
-                                        key: 'returns',
+                                        key: "returns",
                                         icon: Undo2,
-                                        title: t('service.return_policy'),
+                                        title: t("service.return_policy"),
                                         text: policies.returns,
                                     },
                                 ]
@@ -447,9 +459,9 @@ export default function StorefrontProduct({
                 {related.length > 0 && (
                     <section aria-labelledby="related" className="mt-10">
                         <h2 id="related" className="mb-4 text-xl font-black">
-                            {t('store.related')}
+                            {t("store.related")}
                         </h2>
-                        <Rail label={t('store.related')}>
+                        <Rail label={t("store.related")}>
                             {related.map((item) => (
                                 <ProductCard
                                     key={item.id}

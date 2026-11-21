@@ -1,4 +1,4 @@
-import { Link, usePage } from '@inertiajs/react';
+import { Link, usePage } from "@inertiajs/react";
 import {
     ArrowLeft,
     ArrowRight,
@@ -8,15 +8,16 @@ import {
     Lock,
     PackageSearch,
     ShieldCheck,
-} from 'lucide-react';
-import { useTranslations } from '@/hooks/use-translations';
-import { cn } from '@/lib/utils';
-import type { AuthLayoutProps } from '@/types';
+} from "lucide-react";
+import { useTranslations } from "@/hooks/use-translations";
+import { cn } from "@/lib/utils";
+import type { AuthLayoutProps } from "@/types";
+import StoreLogo from "@/components/store/store-logo";
 
 const locales = [
-    { code: 'ar', label: 'العربية' },
-    { code: 'he', label: 'עברית' },
-    { code: 'en', label: 'English' },
+    { code: "ar", label: "العربية" },
+    { code: "he", label: "עברית" },
+    { code: "en", label: "English" },
 ];
 
 export default function AuthSimpleLayout({
@@ -24,21 +25,21 @@ export default function AuthSimpleLayout({
     title,
     description,
 }: AuthLayoutProps) {
-    const { locale, direction, staffLogin, name: appName } = usePage().props;
+    const { locale, direction, staffLogin, store } = usePage().props;
     const t = useTranslations();
     const isStaff = staffLogin === true;
-    const BackIcon = direction === 'rtl' ? ArrowRight : ArrowLeft;
+    const BackIcon = direction === "rtl" ? ArrowRight : ArrowLeft;
 
     const benefits = isStaff
         ? [
-              { icon: ShieldCheck, label: t('auth.staff_benefit_access') },
-              { icon: ClipboardCheck, label: t('auth.staff_benefit_audit') },
-              { icon: Lock, label: t('auth.staff_benefit_alerts') },
+              { icon: ShieldCheck, label: t("auth.staff_benefit_access") },
+              { icon: ClipboardCheck, label: t("auth.staff_benefit_audit") },
+              { icon: Lock, label: t("auth.staff_benefit_alerts") },
           ]
         : [
-              { icon: BadgeCheck, label: t('auth.benefit_secure') },
-              { icon: PackageSearch, label: t('auth.benefit_orders') },
-              { icon: Headphones, label: t('auth.benefit_support') },
+              { icon: BadgeCheck, label: t("auth.benefit_secure") },
+              { icon: PackageSearch, label: t("auth.benefit_orders") },
+              { icon: Headphones, label: t("auth.benefit_support") },
           ];
 
     return (
@@ -48,7 +49,7 @@ export default function AuthSimpleLayout({
         >
             <aside
                 className={cn(
-                    'relative hidden overflow-hidden bg-topbar p-12 text-on-topbar lg:flex lg:flex-col lg:justify-between',
+                    "relative hidden overflow-hidden bg-topbar p-12 text-on-topbar lg:flex lg:flex-col lg:justify-between",
                 )}
             >
                 <div
@@ -64,22 +65,22 @@ export default function AuthSimpleLayout({
                     href={`/${locale}`}
                     className="relative text-2xl font-black tracking-tight"
                 >
-                    By<span className="text-brand-text">TechM</span>
+                    <StoreLogo />
                 </Link>
 
                 <div className="relative max-w-md animate-in duration-700 fade-in slide-in-from-bottom-3 motion-reduce:animate-none">
                     <h2 className="text-4xl leading-tight font-black">
                         {t(
                             isStaff
-                                ? 'auth.staff_brand_title'
-                                : 'auth.brand_title',
+                                ? "auth.staff_brand_title"
+                                : "auth.brand_title",
                         )}
                     </h2>
                     <p className="mt-4 text-lg opacity-80">
                         {t(
                             isStaff
-                                ? 'auth.staff_brand_description'
-                                : 'auth.brand_description',
+                                ? "auth.staff_brand_description"
+                                : "auth.brand_description",
                         )}
                     </p>
                     <ul className="mt-10 space-y-4">
@@ -98,7 +99,7 @@ export default function AuthSimpleLayout({
                 </div>
 
                 <span className="relative text-sm text-ink-soft">
-                    © {new Date().getFullYear()} {appName}
+                    © {new Date().getFullYear()} {store.name}
                 </span>
             </aside>
 
@@ -109,7 +110,7 @@ export default function AuthSimpleLayout({
                         className="inline-flex items-center gap-2 text-ink-soft transition hover:text-brand-text"
                     >
                         <BackIcon size={16} aria-hidden="true" />
-                        {t('auth.back_to_store')}
+                        {t("auth.back_to_store")}
                     </Link>
                     <nav
                         className="flex items-center gap-3"
@@ -120,13 +121,13 @@ export default function AuthSimpleLayout({
                                 key={item.code}
                                 href={`?lang=${item.code}`}
                                 aria-current={
-                                    locale === item.code ? 'true' : undefined
+                                    locale === item.code ? "true" : undefined
                                 }
                                 className={cn(
-                                    'transition hover:text-brand-text',
+                                    "transition hover:text-brand-text",
                                     locale === item.code
-                                        ? 'text-brand-text'
-                                        : 'text-ink-soft',
+                                        ? "text-brand-text"
+                                        : "text-ink-soft",
                                 )}
                             >
                                 {item.label}
@@ -141,7 +142,10 @@ export default function AuthSimpleLayout({
                             href={`/${locale}`}
                             className="mb-8 block text-center text-3xl font-black tracking-tight lg:hidden"
                         >
-                            By<span className="text-brand-text">TechM</span>
+                            <StoreLogo
+                                className="inline-block"
+                                imageClassName="mx-auto h-12"
+                            />
                         </Link>
                         <div className="rounded-3xl border border-line bg-panel p-6 shadow-sm sm:p-8">
                             <div className="mb-7">
@@ -151,7 +155,7 @@ export default function AuthSimpleLayout({
                                             size={14}
                                             aria-hidden="true"
                                         />
-                                        {appName} Admin
+                                        {store.name} Admin
                                     </span>
                                 )}
                                 <h1 className="text-2xl font-black">{title}</h1>

@@ -113,12 +113,20 @@ class ThemeStylesheet
     {
         $line = self::mix($colors['background'], $dark ? '#FFFFFF' : '#000000', $dark ? 0.13 : 0.1);
 
+        // Text sits on these fills, so each is moved only as far as WCAG AA
+        // (4.5:1) needs, whatever colors the owner picks. A color that already
+        // reads well is kept exactly.
+        $primary = self::ensureContrast($colors['primary'], [$colors['onPrimary']]);
+        $primaryHover = self::ensureContrast($colors['primaryHover'], [$colors['onPrimary']]);
+        $sale = self::ensureContrast($colors['sale'], ['#FFFFFF']);
+        $muted = self::ensureContrast($colors['muted'], [$colors['background'], $colors['surface'], $colors['card']]);
+
         return [
-            '--brand-primary' => $colors['primary'],
-            '--brand-primary-hover' => $colors['primaryHover'],
+            '--brand-primary' => $primary,
+            '--brand-primary-hover' => $primaryHover,
             '--brand-on-primary' => $colors['onPrimary'],
             '--brand-secondary' => $colors['secondary'],
-            '--brand-muted' => $colors['muted'],
+            '--brand-muted' => $muted,
             '--brand-topbar' => $colors['topBar'],
             '--brand-on-topbar' => self::readableTextOn($colors['topBar']),
             '--brand-header' => $colors['headerBg'],
@@ -127,7 +135,7 @@ class ThemeStylesheet
             '--brand-background' => $colors['background'],
             '--brand-surface' => $colors['surface'],
             '--brand-card' => $colors['card'],
-            '--brand-sale' => $colors['sale'],
+            '--brand-sale' => $sale,
             '--brand-urgent' => $colors['urgent'],
             '--brand-accent' => self::ensureContrast($colors['primary'], [$colors['card'], $colors['surface']]),
             '--brand-line' => $line,
@@ -137,12 +145,12 @@ class ThemeStylesheet
             '--card-foreground' => $colors['secondary'],
             '--popover' => $colors['card'],
             '--popover-foreground' => $colors['secondary'],
-            '--primary' => $colors['primary'],
+            '--primary' => $primary,
             '--primary-foreground' => $colors['onPrimary'],
-            '--muted-foreground' => $colors['muted'],
+            '--muted-foreground' => $muted,
             '--border' => $line,
             '--input' => $line,
-            '--ring' => $colors['primary'],
+            '--ring' => $primary,
         ];
     }
 

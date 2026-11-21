@@ -66,7 +66,7 @@ class ThemeEditorTest extends TestCase
     public function test_a_draft_stays_private_until_it_is_published(): void
     {
         $admin = $this->user();
-        $ocean = ThemeCatalog::presets()['ocean']['primary'];
+        $ocean = $this->shownPrimary('ocean');
 
         $this->saveDraft($admin);
 
@@ -138,7 +138,7 @@ class ThemeEditorTest extends TestCase
         $response = $this->get('/ar');
 
         $response->assertDontSee('alert(1)', false);
-        $response->assertSee(ThemeCatalog::presets()['default']['primary'], false);
+        $response->assertSee($this->shownPrimary('default'), false);
     }
 
     public function test_unknown_fonts_are_rejected(): void
@@ -225,7 +225,7 @@ class ThemeEditorTest extends TestCase
     public function test_only_the_admin_who_started_a_preview_sees_the_draft(): void
     {
         $admin = $this->user();
-        $ocean = ThemeCatalog::presets()['ocean']['primary'];
+        $ocean = $this->shownPrimary('ocean');
 
         $this->saveDraft($admin);
         $this->get(route('admin.theme.preview'))->assertRedirect();
@@ -244,7 +244,7 @@ class ThemeEditorTest extends TestCase
         $this->actingAs(User::factory()->create())
             ->withSession(['theme_preview' => true])
             ->get('/ar')
-            ->assertDontSee(ThemeCatalog::presets()['ocean']['primary'])
+            ->assertDontSee($this->shownPrimary('ocean'))
             ->assertInertia(fn (Assert $page) => $page->where('themePreview', false));
     }
 
@@ -282,5 +282,16 @@ class ThemeEditorTest extends TestCase
 
             $this->assertGreaterThanOrEqual(4.5, ThemeStylesheet::contrastRatio($accent, $colors['card']), $name);
         }
+    }
+
+    /**
+     * The primary color as the store draws it: the preset's own, moved only as
+     * far as its button text needs to stay readable.
+     */
+    private function shownPrimary(string $preset): string
+    {
+        $colors = ThemeCatalog::presets()[$preset];
+
+        return ThemeStylesheet::ensureContrast($colors['primary'], [$colors['onPrimary']]);
     }
 }
